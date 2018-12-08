@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "403153219165",
+    "firebase_url": "https://nearu-f5a21.firebaseio.com",
+    "project_id": "nearu-f5a21",
+    "storage_bucket": "nearu-f5a21.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:403153219165:android:023b3721d7421788",
+        "android_client_info": {
+          "package_name": "com.example.rdas6313.nearu"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "403153219165-h8sg00q802nji3uk07571jl8kqrs2svg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.rdas6313.nearu",
+            "certificate_hash": "950d3dcce6597960b005ea4021f400e9c5ca3710"
+          }
+        },
+        {
+          "client_id": "403153219165-lcp3qia4uj8u547mc5pto7ifho72e32l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCBQ4F8w_tBInT1hBQLt7w5neqSFfTEtZQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "403153219165-lcp3qia4uj8u547mc5pto7ifho72e32l.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
