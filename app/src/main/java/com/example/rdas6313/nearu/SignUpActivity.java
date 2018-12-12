@@ -20,6 +20,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.auth.UserProfileChangeRequest;
 
 import java.util.concurrent.TimeUnit;
 
@@ -37,7 +38,7 @@ public class SignUpActivity extends AppCompatActivity implements SignUpCallback 
 
     private String verificationId;
     private PhoneAuthProvider.ForceResendingToken resendingToken;
-    private String PhoneNumber;
+    private String PhoneNumber,userName;
 
     private boolean isCodeSent;
     @Override
@@ -100,9 +101,11 @@ public class SignUpActivity extends AppCompatActivity implements SignUpCallback 
     }
 
     @Override
-    public void OnClickSignUp(String phoneNumber) {
+    public void OnClickSignUp(String phoneNumber,String name) {
         Log.d(TAG,"number "+phoneNumber);
+        //Todo:- check internet connection first
         PhoneNumber = phoneNumber;
+        userName = name;
         sendVerificationCode(phoneNumber,null);
     }
 
@@ -135,7 +138,7 @@ public class SignUpActivity extends AppCompatActivity implements SignUpCallback 
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
-                            open();
+                            saveUserName();
                         }else{
                             Log.d(TAG,task.getException().getMessage());
                             if(task.getException() instanceof FirebaseAuthInvalidCredentialsException){
@@ -164,6 +167,26 @@ public class SignUpActivity extends AppCompatActivity implements SignUpCallback 
         );
         FirebaseAuth.getInstance().useAppLanguage();
         changeUiToOtpVerification();
+    }
+
+    private void saveUserName(){
+        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                .setDisplayName(userName).build();
+        FirebaseAuth.getInstance().getCurrentUser()
+                .updateProfile(profileUpdates)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(task.isSuccessful()){
+                            open();
+                        }else{
+                            //Todo:- show error here
+                            Toast.makeText(SignUpActivity.this,task.getException().getMessage(),Toast.LENGTH_SHORT)
+                                    .show();
+                            Log.e(TAG,task.getException().getMessage());
+                        }
+                    }
+                });
     }
 
     private void changeVerificationIdAndToken(String id,PhoneAuthProvider.ForceResendingToken token){

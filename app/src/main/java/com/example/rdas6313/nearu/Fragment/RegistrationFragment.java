@@ -20,7 +20,7 @@ import com.example.rdas6313.nearu.R;
 public class RegistrationFragment extends Fragment implements View.OnClickListener {
 
     private View root;
-    private EditText phNumberEdittext;
+    private EditText nameView,phNumberEdittext;
     private Button signUpButton;
     private SignUpCallback mCallback;
 
@@ -46,9 +46,23 @@ public class RegistrationFragment extends Fragment implements View.OnClickListen
 
     private void init(){
         mCallback = (SignUpCallback)getActivity();
+        nameView = (EditText)root.findViewById(R.id.name);
         signUpButton = (Button)root.findViewById(R.id.signUp);
         phNumberEdittext = (EditText)root.findViewById(R.id.ph_number);
         signUpButton.setOnClickListener(this);
+    }
+
+    private boolean isNameOk(String name){
+        String msg = null;
+        if(name.isEmpty() || name.length() == 0){
+            msg = "This field can't be empty";
+        }
+        if(msg != null){
+            nameView.setError(msg);
+            return false;
+        }else
+            return true;
+
     }
 
 
@@ -56,13 +70,13 @@ public class RegistrationFragment extends Fragment implements View.OnClickListen
     public void onClick(View v) {
         if(v.getId() != R.id.signUp)
             return;
-
+        String name = nameView.getText().toString();
         String phNumber = phNumberEdittext.getText().toString();
-        if(!isPhoneNumberOk(phNumber))
+        if(!isPhoneNumberOk(phNumber) || !isNameOk(name))
             return;
 
         if(mCallback != null)
-            mCallback.OnClickSignUp("+91"+phNumber);
+            mCallback.OnClickSignUp("+91"+phNumber,name);
     }
 
     private boolean isPhoneNumberOk(String phone){
