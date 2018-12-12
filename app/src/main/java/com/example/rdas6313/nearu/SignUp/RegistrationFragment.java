@@ -1,4 +1,4 @@
-package com.example.rdas6313.nearu.Fragment;
+package com.example.rdas6313.nearu.SignUp;
 
 
 import android.os.Bundle;
@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.example.rdas6313.nearu.Interfaces.SignUpCallback;
 import com.example.rdas6313.nearu.R;
 
 

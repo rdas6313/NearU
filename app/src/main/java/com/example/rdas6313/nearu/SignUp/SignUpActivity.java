@@ -1,4 +1,4 @@
-package com.example.rdas6313.nearu;
+package com.example.rdas6313.nearu.SignUp;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -8,16 +8,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.example.rdas6313.nearu.Fragment.OtpVerificationFragment;
-import com.example.rdas6313.nearu.Fragment.RegistrationFragment;
-import com.example.rdas6313.nearu.Interfaces.SignUpCallback;
+import com.example.rdas6313.nearu.MainActivity;
+import com.example.rdas6313.nearu.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.auth.UserProfileChangeRequest;
