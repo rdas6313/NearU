@@ -1,6 +1,9 @@
 package com.example.rdas6313.nearu.SignUp;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -39,12 +42,15 @@ public class SignUpActivity extends AppCompatActivity implements SignUpCallback 
     private String PhoneNumber,userName;
 
     private boolean isCodeSent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
+        Log.d(TAG,"OnCreate ");
         init();
     }
+
 
     private void init(){
         registrationFragment = new RegistrationFragment();
@@ -76,7 +82,6 @@ public class SignUpActivity extends AppCompatActivity implements SignUpCallback 
             @Override
             public void onVerificationCompleted(PhoneAuthCredential phoneAuthCredential) {
                 Log.d(TAG,"onVerification: "+phoneAuthCredential.getSmsCode());
-                //Todo:- do something when verification completed and change Verification token and id to null
                 isCodeSent = false;
                 if(otpVerificationFragment != null)
                     otpVerificationFragment.onAuToVerification(phoneAuthCredential.getSmsCode());
@@ -98,10 +103,24 @@ public class SignUpActivity extends AppCompatActivity implements SignUpCallback 
         };
     }
 
+    private boolean isDeviceConnectedToInternet(){
+        ConnectivityManager cm =
+                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+        return isConnected;
+    }
+
     @Override
     public void OnClickSignUp(String phoneNumber,String name) {
         Log.d(TAG,"number "+phoneNumber);
-        //Todo:- check internet connection first
+        if(!isDeviceConnectedToInternet()){
+            //Todo:- show that u r not connected to internet
+            Toast.makeText(this,"Plz check your internet connection",Toast.LENGTH_SHORT).show();
+            return;
+        }
         PhoneNumber = phoneNumber;
         userName = name;
         sendVerificationCode(phoneNumber,null);
@@ -194,7 +213,7 @@ public class SignUpActivity extends AppCompatActivity implements SignUpCallback 
 
 
     private void changeUiToOtpVerification(){
-        //Todo:- open otp verification Fragment and remove registration Fragment
+        Log.e(TAG,"Changing UI to otp verification");
         fragmentManager.beginTransaction().replace(R.id.signup_fragment_container,otpVerificationFragment)
                 .commit();
 
@@ -203,8 +222,10 @@ public class SignUpActivity extends AppCompatActivity implements SignUpCallback 
     @Override
     protected void onStart() {
         super.onStart();
-        if(FirebaseAuth.getInstance().getCurrentUser() != null){
+        Log.d(TAG,"OnStart ");
+        //Todo:- check if user already loggedIn then send him to next mapActivity
+       /* if(FirebaseAuth.getInstance().getCurrentUser() != null){
             open();
-        }
+        }*/
     }
 }
