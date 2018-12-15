@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="Map"
+        android:icon="@drawable/icon_point"
+        android:id="@+id/location"/>
+    <item android:title="Friends"
+        android:icon="@drawable/icon_frnds"
+        android:id="@+id/frnds"/>
+    <item android:title="Profile"
+        android:icon="@drawable/icon_profile"
+        android:id="@+id/profile"/>
+</menu>

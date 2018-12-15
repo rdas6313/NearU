@@ -224,8 +224,8 @@ public class SignUpActivity extends AppCompatActivity implements SignUpCallback 
         super.onStart();
         Log.d(TAG,"OnStart ");
         //Todo:- check if user already loggedIn then send him to next mapActivity
-       /* if(FirebaseAuth.getInstance().getCurrentUser() != null){
+        if(FirebaseAuth.getInstance().getCurrentUser() != null){
             open();
-        }*/
+        }
     }
 }
