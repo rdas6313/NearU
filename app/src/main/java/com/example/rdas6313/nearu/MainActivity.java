@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         mapFragment = new MapFragment();
         frndsFragment = new FrndsFragment();
         profileFragment = new ProfileFragment();
+
         loadFragments(mapFragment);
     }
 

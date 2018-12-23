@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:mapbox="http://schemas.android.com/apk/res-auto"
     tools:context=".MapFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <com.mapbox.mapboxsdk.maps.MapView
+        android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Map" />
+        mapbox:mapbox_styleUrl="mapbox://styles/rdas6313/cjq0s5xll31um2robtkse4kit"
+        />
 
-</FrameLayout>
+    <!-- mapbox://styles/mapbox/streets-v11 for street -->
+
+</android.support.constraint.ConstraintLayout>
