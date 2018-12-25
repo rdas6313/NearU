@@ -1,14 +1,18 @@
 package com.example.rdas6313.nearu;
 
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,11 +21,19 @@ import android.view.ViewGroup;
 
 import com.example.rdas6313.nearu.Permissions.PermissionUtils;
 import com.example.rdas6313.nearu.Permissions.PermissionUtilsListener;
+import com.mapbox.android.core.location.LocationEngine;
+import com.mapbox.android.core.location.LocationEngineListener;
+import com.mapbox.android.core.location.LocationEnginePriority;
+import com.mapbox.android.core.location.LocationEngineProvider;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.location.LocationComponent;
+import com.mapbox.mapboxsdk.location.LocationComponentOptions;
+import com.mapbox.mapboxsdk.location.modes.CameraMode;
+import com.mapbox.mapboxsdk.location.modes.RenderMode;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -30,7 +42,7 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class MapFragment extends Fragment implements OnMapReadyCallback,PermissionUtilsListener {
+public class MapFragment extends Fragment implements OnMapReadyCallback,PermissionUtilsListener,LocationEngineListener {
 
     private static final String TAG = MapFragment.class.getSimpleName();
 
@@ -42,7 +54,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,Permissi
     private PermissionUtils permissionManager;
 
     private boolean isLocationPermissionGranted = false;
+    private boolean shouldCheckPermission = false;
+    private boolean gpsSettingsOn = false;
 
+    private LocationEngine locationEngine;
+    private LocationComponent locationComponent;
+
+    private Location currentLocation;
 
     public MapFragment() {
         // Required empty public constructor
@@ -73,6 +91,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,Permissi
     private void checkLocationPermission(){
         if(PermissionUtils.isLocationPermissionGranted(getContext())){
             //granted
+            initLocation();
             isLocationPermissionGranted = true;
         }else{
             permissionManager = new PermissionUtils(this);
@@ -82,6 +101,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,Permissi
 
     @Override
     public void onDontAskAgain() {
+        shouldCheckPermission = true;
         openApplicationSettings();
     }
 
@@ -102,6 +122,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,Permissi
     @Override
     public void onPermissionResult(boolean isGranted) {
         if(isGranted){
+            initLocation();
             isLocationPermissionGranted = true;
         }else{
             showDialog();
@@ -148,38 +169,133 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,Permissi
     }
     /* Permission Related Methods End in here */
 
+
+    private void initLocation(){
+        initLocationEngine();
+        initLocationComponent();
+        if(!isGpsEnabled())
+            enableGps();
+    }
+
     @Override
     public void onMapReady(MapboxMap mapboxMap) {
         Log.d(TAG,"Map Ready");
         map = mapboxMap;
-        addMarker(new LatLng(48.13863, 11.57603));
+        checkLocationPermission();
+        //addMarker(new LatLng(48.13863, 11.57603));
         //Todo:- do whatever u want to do after map loaded
     }
+
+    @SuppressWarnings("MissingPermission")
+    private void initLocationEngine(){
+        Log.d(TAG,"initEngine");
+        if(locationEngine == null) {
+            locationEngine = new LocationEngineProvider(getContext()).obtainBestLocationEngineAvailable();
+            locationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);
+            locationEngine.addLocationEngineListener(this);
+            locationEngine.activate();
+        }
+        Log.d(TAG,locationEngine.obtainType().name());
+        Location location = locationEngine.getLastLocation();
+
+        if(location != null){
+            currentLocation = location;
+            moveCamera(new LatLng(location.getLatitude(),location.getLongitude()));
+        }
+    }
+
+    private void moveCamera(LatLng latLng){
+        if(map == null)
+            return;
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(latLng)
+                .tilt(20)
+                .zoom(12)
+                .build();
+        map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition),3000);
+    }
+
+    private boolean isGpsEnabled(){
+        LocationManager locationManager = (LocationManager)getContext().getSystemService(Context.LOCATION_SERVICE);
+        if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+            return true;
+        return false;
+    }
+
+    private void enableGps(){
+        gpsSettingsOn = true;
+        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        startActivityForResult(intent,100);
+    }
+
+    @SuppressWarnings("MissingPermission")
+    private void initLocationComponent(){
+        if(map == null)
+            return;
+        locationComponent = map.getLocationComponent();
+        locationComponent.activateLocationComponent(getContext());
+        locationComponent.setLocationComponentEnabled(true);
+        locationComponent.setCameraMode(CameraMode.TRACKING);
+        locationComponent.setRenderMode(RenderMode.NORMAL);
+    }
+
+    @Override
+    @SuppressWarnings("MissingPermission")
+    public void onConnected() {
+        if(locationEngine == null)
+            return;
+        locationEngine.requestLocationUpdates();
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        Log.d(TAG,"new Location "+location.getLongitude()+" "+location.getLongitude());
+        currentLocation = location;
+        moveCamera(new LatLng(location.getLatitude(),location.getLongitude()));
+    }
+
+
 
     private void addMarker(LatLng latLng){
         MarkerOptions markerOptions = new MarkerOptions()
                 .position(latLng)
                 .title("Test Heading")
                 .snippet("Test snippet");
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(latLng)
-                .tilt(20)
-                .zoom(12)
-                .build();
 
         if(map != null) {
             map.addMarker(markerOptions);
-            map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition),3000);
+            moveCamera(latLng);
         }
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        //checking for location permission
-        checkLocationPermission();
+        Log.d(TAG,"OnStart");
+        if(shouldCheckPermission) {
+            checkLocationPermission();
+            shouldCheckPermission = false;
+        }
+
+        if(locationComponent != null){
+            locationComponent.onStart();
+        }
+        if(locationEngine != null){
+            locationEngine.addLocationEngineListener(this);
+            locationEngine.requestLocationUpdates();
+        }
+
         if(mapView != null)
             mapView.onStart();
+
+        if(gpsSettingsOn){
+            gpsSettingsOn = false;
+            if(!isGpsEnabled()){
+                enableGps();
+            }
+
+        }
+
     }
 
     @Override
@@ -199,8 +315,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,Permissi
     @Override
     public void onStop() {
         super.onStop();
+        shouldCheckPermission = true;
         if(mapView != null)
             mapView.onStop();
+
+        if(locationEngine != null) {
+            locationEngine.removeLocationEngineListener(this);
+            locationEngine.removeLocationUpdates();
+        }
     }
 
     @Override
@@ -215,6 +337,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,Permissi
         super.onDestroyView();
         if(mapView != null)
             mapView.onDestroy();
+
+        if(locationEngine != null)
+            locationEngine.deactivate();
     }
 
     @Override
@@ -223,5 +348,4 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,Permissi
         if(mapView != null)
             mapView.onSaveInstanceState(outState);
     }
-
 }
