@@ -21,6 +21,13 @@ import android.view.ViewGroup;
 
 import com.example.rdas6313.nearu.Permissions.PermissionUtils;
 import com.example.rdas6313.nearu.Permissions.PermissionUtilsListener;
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineListener;
 import com.mapbox.android.core.location.LocationEnginePriority;
@@ -62,6 +69,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,Permissi
 
     private Location currentLocation;
 
+    private GeoFire geoFire;
+
+    private final String SERVER_LOCATION_KEY = "current_location";
+
     public MapFragment() {
         // Required empty public constructor
     }
@@ -84,7 +95,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,Permissi
         super.onActivityCreated(savedInstanceState);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
-
     }
 
     /* Permission Related Methods Start from here */
@@ -171,6 +181,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,Permissi
 
 
     private void initLocation(){
+        initGeofire();
         initLocationEngine();
         initLocationComponent();
         if(!isGpsEnabled())
@@ -201,6 +212,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,Permissi
         if(location != null){
             currentLocation = location;
             moveCamera(new LatLng(location.getLatitude(),location.getLongitude()));
+            sendLocationDataToServer(location);
         }
     }
 
@@ -225,7 +237,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,Permissi
     private void enableGps(){
         gpsSettingsOn = true;
         Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-        startActivityForResult(intent,100);
+        startActivity(intent);
     }
 
     @SuppressWarnings("MissingPermission")
@@ -236,7 +248,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,Permissi
         locationComponent.activateLocationComponent(getContext());
         locationComponent.setLocationComponentEnabled(true);
         locationComponent.setCameraMode(CameraMode.TRACKING);
-        locationComponent.setRenderMode(RenderMode.NORMAL);
+        locationComponent.setRenderMode(RenderMode.COMPASS);
     }
 
     @Override
@@ -252,9 +264,32 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,Permissi
         Log.d(TAG,"new Location "+location.getLongitude()+" "+location.getLongitude());
         currentLocation = location;
         moveCamera(new LatLng(location.getLatitude(),location.getLongitude()));
+        sendLocationDataToServer(location);
     }
 
+    private void sendLocationDataToServer(Location location){
+        geoFire.setLocation(SERVER_LOCATION_KEY, new GeoLocation(location.getLatitude(), location.getLongitude()), new GeoFire.CompletionListener() {
+            @Override
+            public void onComplete(String key, DatabaseError error) {
+                if(error != null){
+                    Log.e(TAG,error.getDetails());
+                }
+            }
+        });
+    }
 
+    private void initGeofire(){
+        if(geoFire == null){
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if(user == null){
+                Log.e(TAG,"User is not logged in");
+                return;
+            }
+            DatabaseReference reference = FirebaseDatabase.getInstance().getReference(user.getUid()+"/");
+            geoFire = new GeoFire(reference);
+        }
+
+    }
 
     private void addMarker(LatLng latLng){
         MarkerOptions markerOptions = new MarkerOptions()
