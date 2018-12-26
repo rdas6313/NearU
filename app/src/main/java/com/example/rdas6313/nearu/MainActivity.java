@@ -11,9 +11,6 @@ import android.view.MenuItem;
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
     private BottomNavigationView bottomNavigationView;
-    private MapFragment mapFragment;
-    private FrndsFragment frndsFragment;
-    private ProfileFragment profileFragment;
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -29,24 +26,20 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         bottomNavigationView = (BottomNavigationView)findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
 
-        mapFragment = new MapFragment();
-        frndsFragment = new FrndsFragment();
-        profileFragment = new ProfileFragment();
-
-        loadFragments(mapFragment);
+        loadFragments(new MapFragment());
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         switch (menuItem.getItemId()){
             case R.id.location:
-                loadFragments(mapFragment);
+                loadFragments(new MapFragment());
                 return true;
             case R.id.frnds:
-                loadFragments(frndsFragment);
+                loadFragments(new FrndsFragment());
                 return true;
             case R.id.profile:
-                loadFragments(profileFragment);
+                loadFragments(new ProfileFragment());
                 return true;
             default:
                 return false;
