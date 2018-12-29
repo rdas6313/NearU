@@ -12,4 +12,14 @@
     <string name="EXPLANATION_DIALOG_MSG">We need Location Permission to show your current location and to help your friends to find you.</string>
     <string name="EXPLANATION_DIALOG_POSITIVE_BTN_TEXT">Ok i understand</string>
 
+    <string name="USER_DATA_KEY">user_data</string>
+    <string name="USER_NAME_KEY">name</string>
+    <string name="GEOFIRE_ROOT_REF">user_locations</string>
+    <string name="USER_PRESENCE_KEY">user_presence</string>
+    <string name="CONNECTION_PATH">.info/connected</string>
+    <string name="USER_LAST_LOCATION_KEY">last_location</string>
+    <string name="LATITUDE">lat</string>
+    <string name="LONGITUDE">lng</string>
+
+    <string name="NAME_KEY">name</string>
 </resources>

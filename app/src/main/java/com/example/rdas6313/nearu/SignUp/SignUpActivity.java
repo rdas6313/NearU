@@ -19,9 +19,12 @@ import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.concurrent.TimeUnit;
 
@@ -189,19 +192,40 @@ public class SignUpActivity extends AppCompatActivity implements SignUpCallback 
     private void saveUserName(){
         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                 .setDisplayName(userName).build();
-        FirebaseAuth.getInstance().getCurrentUser()
-                .updateProfile(profileUpdates)
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if(user == null){
+            Log.e(TAG,"There is some problem in SaveUserName Method.User not logged in.");
+            return;
+        }
+         user.updateProfile(profileUpdates)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()){
-                            open();
+                            saveUserDataToDatabase(userName,user);
                         }else{
                             //Todo:- show error here
                             Toast.makeText(SignUpActivity.this,task.getException().getMessage(),Toast.LENGTH_SHORT)
                                     .show();
                             Log.e(TAG,task.getException().getMessage());
                         }
+                    }
+                });
+    }
+
+    private void saveUserDataToDatabase(String name,FirebaseUser user){
+        if(user == null)
+            return;
+        String path = getString(R.string.USER_DATA_KEY)+"/"+user.getUid();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(path).child(getString(R.string.USER_NAME_KEY));
+        reference.setValue(name)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(!task.isSuccessful()){
+                            Log.e(TAG,task.getException().getMessage());
+                        }
+                        open();
                     }
                 });
     }
