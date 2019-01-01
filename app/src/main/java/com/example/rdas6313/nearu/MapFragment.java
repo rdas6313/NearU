@@ -45,6 +45,7 @@ import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.location.LocationComponentOptions;
 import com.mapbox.mapboxsdk.location.modes.CameraMode;
@@ -67,9 +68,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
     private static final String TAG = MapFragment.class.getSimpleName();
 
     private static final int LOCATION_REQUEST_CODE = 2123;
-    private static final float SEARCH_USER_RADIUS = 0.5f; // in kilo meter
+    private static final float SEARCH_USER_RADIUS = 1.0f; // in kilo meter
     private static final double CAMERA_ZOOM_LEVEL = 12;
     private static final int ANIMATE_CAMERA_DURATION = 4000;
+    private static final int CAMERA_PADDING = 10;
 
     private MapView mapView;
     private MapboxMap map;
@@ -95,6 +97,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
 
 
     private HashMap<String,User> userData;
+
+    private ArrayList<LatLng> latLngList;
 
 
     public MapFragment() {
@@ -243,17 +247,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
         }
     }
 
-    private void moveCamera(LatLng latLng) {
-        if (map == null)
-            return;
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(latLng)
-                .tilt(20)
-                .zoom(CAMERA_ZOOM_LEVEL)
-                .build();
-        map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), ANIMATE_CAMERA_DURATION);
-    }
-
     private boolean isGpsEnabled() {
         LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
@@ -296,9 +289,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
         onDisconnect();
     }
 
-    private void initUserDataList() {   // initializing user Data List
-        if (userData == null)
+    private void initUserDataList() {   // initializing user Data List and Latlng list
+        if (userData == null) {
             userData = new HashMap();
+        }
+        if(latLngList == null) {
+            latLngList = new ArrayList<>();
+            latLngList.add(new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()));
+        }
     }
 
     private void loadUserLocation(Location location, float radius) { // fetching Near By Users using Device user Location and radius
@@ -309,10 +307,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
             geoQuery.addGeoQueryEventListener(this);
         }else{ // for update query
             geoQuery.setLocation(new GeoLocation(location.getLatitude(),location.getLongitude()),radius);
-            initUserDataList();
+            /*initUserDataList();
             userData.clear();
             if(map != null)
-                map.clear();
+                map.clear();*/
         }
     }
 
@@ -332,7 +330,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
         Utility utility = Utility.getInstance();
         if(!utility.isUserLoggedIn())
             return;
-        String path = getString(R.string.USER_DATA_KEY)+"/"+utility.getUserId();
+        String path = getString(R.string.USER_DATA_KEY)+"/"+user.getId();
         DatabaseReference userDataRef = FirebaseDatabase.getInstance().getReference(path);
         userDataRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -361,7 +359,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
         User user = new User(key,latLng,getContext());
         fetchUsersDataFromServer(user);
         userData.put(key,user);
-
+        utility.addLatlngToList(latLng,latLngList);
+        utility.adjustCameraZoomForMarkers(map,latLngList,CAMERA_PADDING);
     }
 
     @Override
@@ -373,6 +372,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
             Utility utility = Utility.getInstance();
             utility.removeMarkerFromMap(user.getMarker(),map);
             userData.remove(key);
+            utility.removeLatlngFromList(user.getLocation(),latLngList);
+            user = null;
+            utility.adjustCameraZoomForMarkers(map,latLngList,CAMERA_PADDING);
         }
     }
 
@@ -383,8 +385,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
         if(userData != null && userData.containsKey(key)){
             User user = userData.get(key);
             LatLng latLng = new LatLng(location.latitude,location.longitude);
+            utility.updateLatlngFromList(user.getLocation(),latLng,latLngList);
             user.setLocation(latLng);
             user.getMarker().setPosition(latLng);
+            utility.adjustCameraZoomForMarkers(map,latLngList,CAMERA_PADDING);
+            Toast.makeText(getContext(),user.getName()+" is Moving. "+key,Toast.LENGTH_SHORT).show();
+        }else if(location.latitude == currentLocation.getLatitude() && location.longitude == currentLocation.getLongitude()){
+            Utility utility = Utility.getInstance();
+            utility.updateLatlngFromList(0,new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()),latLngList);
+            utility.adjustCameraZoomForMarkers(map,latLngList,CAMERA_PADDING);
         }
     }
 
@@ -435,6 +444,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
             shouldCheckPermission = false;
         }
 
+        if (gpsSettingsOn) {
+            gpsSettingsOn = false;
+            if (!isGpsEnabled()) {
+                enableGps();
+            }
+        }
+
         if (locationComponent != null) {
             locationComponent.onStart();
         }
@@ -449,12 +465,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
         if (mapView != null)
             mapView.onStart();
 
-        if (gpsSettingsOn) {
-            gpsSettingsOn = false;
-            if (!isGpsEnabled()) {
-                enableGps();
-            }
-        }
 
     }
 
@@ -489,6 +499,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
         if(userData != null) {
             userData.clear();
             userData = null;
+        }
+
+        if(latLngList != null){
+            latLngList.clear();
+            latLngList = null;
         }
     }
 
