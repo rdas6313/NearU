@@ -22,4 +22,6 @@
     <string name="LONGITUDE">lng</string>
 
     <string name="NAME_KEY">name</string>
+    <string name="marker_chat_btn_text">Chat</string>
+    <string name="default_snippet_text">Hi,lets talk</string>
 </resources>

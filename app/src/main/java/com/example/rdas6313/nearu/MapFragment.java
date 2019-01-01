@@ -18,6 +18,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.rdas6313.nearu.Permissions.PermissionUtils;
@@ -63,7 +65,7 @@ import java.util.Map;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class MapFragment extends Fragment implements OnMapReadyCallback, PermissionUtilsListener, LocationEngineListener, GeoQueryEventListener  {
+public class MapFragment extends Fragment implements OnMapReadyCallback, PermissionUtilsListener, LocationEngineListener, GeoQueryEventListener,View.OnClickListener,MapboxMap.InfoWindowAdapter {
 
     private static final String TAG = MapFragment.class.getSimpleName();
 
@@ -99,6 +101,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
     private HashMap<String,User> userData;
 
     private ArrayList<LatLng> latLngList;
+
+    private HashMap<Long,String>markerData;
 
 
     public MapFragment() {
@@ -224,6 +228,42 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
         Log.d(TAG, "Map Ready");
         map = mapboxMap;
         checkLocationPermission();
+        map.setInfoWindowAdapter(this);
+
+    }
+
+    @Nullable
+    @Override
+    public View getInfoWindow(@NonNull Marker marker) {
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.info_window_layout,null,false);
+        TextView titleView = (TextView) view.findViewById(R.id.infoWindowtitle);
+        titleView.setText(marker.getTitle());
+        TextView snippetView = (TextView)view.findViewById(R.id.infoWindowSnippet);
+        if(marker.getSnippet() == null || marker.getSnippet().length() == 0)
+            snippetView.setText(getString(R.string.default_snippet_text));
+        else
+            snippetView.setText(marker.getSnippet());
+
+        Button chatBtn = (Button)view.findViewById(R.id.chatBtn);
+        chatBtn.setTag(marker.getId());
+        chatBtn.setOnClickListener(MapFragment.this);
+        return view;
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v.getTag() == null)
+            return;
+        long markerId = (long)v.getTag();
+        if(markerData != null && markerData.containsKey(markerId)){
+            String markerUserKey = markerData.get(markerId);
+            openChatWindow(markerUserKey);
+        }
+    }
+
+    private void openChatWindow(String userKey){
+        //Todo:- open chat fragment here
+        Log.d(TAG,"open Chat window "+userKey);
     }
 
     @SuppressWarnings("MissingPermission")
@@ -289,7 +329,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
         onDisconnect();
     }
 
-    private void initUserDataList() {   // initializing user Data List and Latlng list
+    private void initUserDataList() {   // initializing user Data List and Latlng list and marker Data
         if (userData == null) {
             userData = new HashMap();
         }
@@ -297,6 +337,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
             latLngList = new ArrayList<>();
             latLngList.add(new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()));
         }
+        if(markerData == null)
+            markerData = new HashMap<>();
     }
 
     private void loadUserLocation(Location location, float radius) { // fetching Near By Users using Device user Location and radius
@@ -336,7 +378,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 user.setName(dataSnapshot.child(getString(R.string.NAME_KEY)).getValue(String.class));
-                user.setMarker(utility.addMarkerToMap(user.getLocation(),user.getName(),"",map));
+                Marker marker = utility.addMarkerToMap(user.getLocation(),user.getName(),"",map);
+                user.setMarker(marker);
+                if(markerData != null)
+                    markerData.put(marker.getId(),user.getId());
+
             }
 
             @Override
@@ -373,6 +419,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
             utility.removeMarkerFromMap(user.getMarker(),map);
             userData.remove(key);
             utility.removeLatlngFromList(user.getLocation(),latLngList);
+            if(markerData != null && markerData.containsKey(user.getMarker().getId()))
+                markerData.remove(user.getMarker().getId());
             user = null;
             utility.adjustCameraZoomForMarkers(map,latLngList,CAMERA_PADDING);
         }
@@ -485,6 +533,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
     @Override
     public void onStop() {
         super.onStop();
+        Log.d(TAG,"onStop");
         shouldCheckPermission = true;
         if (mapView != null)
             mapView.onStop();
@@ -505,6 +554,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
             latLngList.clear();
             latLngList = null;
         }
+
+        if(markerData != null) {
+            markerData.clear();
+            markerData = null;
+        }
+        if(map != null)
+            map.clear();
     }
 
     @Override
