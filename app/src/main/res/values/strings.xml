@@ -5,11 +5,11 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="MAPBOX_ACCESS_TOKEN">pk.eyJ1IjoicmRhczYzMTMiLCJhIjoiY2pxMG9pMTMzMHAxcDQydWwweXc2djllcSJ9.bJVIJLtBf6Yr3NN27DxCCQ</string>
 
-    <string name="SHOW_DIALOG_MSG">We need Location Permission to get your current location.If you can\'t allow the location permission,we have no other choice but to close the app.Thank you</string>
+    <string name="SHOW_DIALOG_MSG">We need location permission and phone state permission to get your current location.If you can\'t allow the location permission and the phone state permission,we have no other choice but to close the app.Thank you</string>
     <string name="SHOW_DIALOG_POSITIVE_BTN_TEXT">I\'ll give Permission</string>
     <string name="SHOW_DIALOG_NEGETIVE_BTN_TEXT">Can\'t give permission</string>
 
-    <string name="EXPLANATION_DIALOG_MSG">We need Location Permission to show your current location and to help your friends to find you.</string>
+    <string name="EXPLANATION_DIALOG_MSG">We need location permission and phone state permission to show your current location and to help your friends to find you.</string>
     <string name="EXPLANATION_DIALOG_POSITIVE_BTN_TEXT">Ok i understand</string>
 
     <string name="USER_DATA_KEY">user_data</string>

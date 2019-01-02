@@ -132,7 +132,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
 
     /* Permission Related Methods Start from here */
     private void checkLocationPermission() {
-        if (PermissionUtils.isLocationPermissionGranted(getContext())) {
+        if (PermissionUtils.isPermissionGranted(getContext())) {
             //granted
             initLocation();
             isLocationPermissionGranted = true;

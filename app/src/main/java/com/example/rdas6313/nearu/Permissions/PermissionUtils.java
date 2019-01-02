@@ -19,7 +19,7 @@ public class PermissionUtils {
     }
 
     public void requestLocationPermission(Fragment fragment){
-        if (fragment.shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+        if (fragment.shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION) && fragment.shouldShowRequestPermissionRationale(Manifest.permission.READ_PHONE_STATE)) {
                 explain();
         }else{
             if(mListener != null)
@@ -34,14 +34,14 @@ public class PermissionUtils {
 
     private void requestPermission(Fragment fragment){
         fragment.requestPermissions(new String[]{
-                Manifest.permission.ACCESS_FINE_LOCATION
+                Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.READ_PHONE_STATE
         },LOCATION_PERMISSION_REQUEST);
     }
 
-    public static boolean isLocationPermissionGranted(Context context){
+    public static boolean isPermissionGranted(Context context){
         if(ContextCompat.checkSelfPermission(context,
                 Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED){
+                != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(context,Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED){
             return false;
         }
         return true;
@@ -50,7 +50,7 @@ public class PermissionUtils {
     public void onRequestPermissionResult(int requestCode,String permissions[],int grantResults[]){
         switch (requestCode){
             case LOCATION_PERMISSION_REQUEST:{
-                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED){
                     sendPermissionResult(true);
                 }else{
                     //Permission Denied
