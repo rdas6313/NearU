@@ -24,4 +24,14 @@
     <string name="NAME_KEY">name</string>
     <string name="marker_chat_btn_text">Chat</string>
     <string name="default_snippet_text">Hi,lets talk</string>
+    <string name="CURRENT_USER_ID">current_user_id</string>
+    <string name="CHAT_USER_ID">chat_user_id</string>
+    <string name="ChatFragment_TAG">ChatFragment</string>
+    <string name="chat_send_btn">Send</string>
+    <string name="USER_CHAT_REF">user_chats</string>
+    <string name="RECEIVER_ID">receiver_id</string>
+    <string name="SENDER_ID">sender_id</string>
+    <string name="CHAT_MSG">msg</string>
+    <string name="CHAT_TIMESTAMP">timestamp</string>
+    <string name="CHAT_DATA">chat_data</string>
 </resources>

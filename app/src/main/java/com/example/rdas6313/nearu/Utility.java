@@ -109,4 +109,17 @@ public final class Utility {
         map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition),animation_duration);
     }
 
+    public String getChatUserId(String u1,String u2){
+        if(u1.compareTo(u2) < 0)
+            return u1+u2;
+        else
+            return u2+u1;
+    }
+
+    public boolean isMsgOk(String msg){
+        if(msg == null || msg.length() == 0)
+            return false;
+        return true;
+    }
+
 }

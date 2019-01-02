@@ -3,9 +3,9 @@
     package="com.example.rdas6313.nearu">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:name=".App"
@@ -13,19 +13,24 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name=".SignUp.SignUpActivity" android:screenOrientation="portrait">
+        android:supportsRtl="true">
+        <activity
+            android:theme="@style/AppTheme"
+            android:name=".SignUp.SignUpActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".MainActivity" android:theme="@style/AppTheme" />
+
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="64e4979b3c16d352147c23fefb4997f79f53c963" />
+
+        <activity android:name=".Chat.ChatActivity" android:theme="@style/AppTheme_ActionBar"></activity>
     </application>
 
 </manifest>

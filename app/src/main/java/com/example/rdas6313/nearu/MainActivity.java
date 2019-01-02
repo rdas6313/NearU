@@ -10,16 +10,14 @@ import android.util.Log;
 import android.view.MenuItem;
 
 import com.crashlytics.android.Crashlytics;
+import com.example.rdas6313.nearu.Chat.ChatActivity;
+import com.example.rdas6313.nearu.Map.FragmentCallback;
+import com.example.rdas6313.nearu.Map.MapFragment;
 import com.example.rdas6313.nearu.SignUp.SignUpActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
-public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener{
+public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener,FragmentCallback {
 
     private BottomNavigationView bottomNavigationView;
 
@@ -32,12 +30,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         init();
         logUserToFabric();
     }
-
-    public void forceCrash() {
-        throw new RuntimeException("This is a crash");
-    }
-
-
 
     private void init(){
         bottomNavigationView = (BottomNavigationView)findViewById(R.id.bottom_navigation);
@@ -79,10 +71,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     @Override
     protected void onStart() {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if(user == null){
+        Utility utility = Utility.getInstance();
+        if(!utility.isUserLoggedIn()){
             Log.e(TAG,"Invalid User");
-
             startSignUpActivity();
             finish();
         }
@@ -102,6 +93,16 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             return;
         Crashlytics.setUserIdentifier(user.getUid());
         Crashlytics.setUserName(user.getDisplayName());
+    }
+
+    @Override
+    public void onChatBtnCliked(String currentUserid, String chatUserid) {
+        Bundle bundle = new Bundle();
+        bundle.putString(getString(R.string.CURRENT_USER_ID),currentUserid);
+        bundle.putString(getString(R.string.CHAT_USER_ID),chatUserid);
+        Intent intent = new Intent(this,ChatActivity.class);
+        intent.putExtras(bundle);
+        startActivity(intent);
     }
 
 }
