@@ -62,7 +62,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         inputEditText = (EditText)findViewById(R.id.chatinput);
         sendBtn = (Button)findViewById(R.id.chatSendBtn);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new RecyclerAdapter(currentUserid);
+        adapter = new RecyclerAdapter(currentUserid,recyclerView);
         recyclerView.setAdapter(adapter);
         sendBtn.setOnClickListener(this);
         Utility utility = Utility.getInstance();

@@ -20,11 +20,14 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
     private final int LEFT_VIEW = 0;
     private final int RIGHT_VIEW = 1;
 
+    private RecyclerView recyclerView;
+
     private final String TAG = RecyclerAdapter.class.getName();
 
-    public RecyclerAdapter(String loggedInUserId){
+    public RecyclerAdapter(String loggedInUserId,RecyclerView recyclerView){
         messages = new ArrayList<>();
         this.loggedInUserId = loggedInUserId;
+        this.recyclerView = recyclerView;
     }
 
     public void addMessage(Message message){
@@ -32,6 +35,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
             return;
         messages.add(message);
         notifyItemInserted(messages.size()-1);
+        recyclerView.scrollToPosition(messages.size()-1);
     }
 
     public void addMessages(ArrayList<Message> messagelist){
