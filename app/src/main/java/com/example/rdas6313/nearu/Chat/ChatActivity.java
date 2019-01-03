@@ -23,7 +23,7 @@ import com.google.firebase.database.ServerValue;
 
 import java.util.HashMap;
 
-public class ChatActivity extends AppCompatActivity implements View.OnClickListener,ChildEventListener {
+public class ChatActivity extends AppCompatActivity implements View.OnClickListener,ChildEventListener,View.OnLayoutChangeListener {
 
 
     private String currentUserid,chatUserid;
@@ -64,10 +64,23 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new RecyclerAdapter(currentUserid,recyclerView);
         recyclerView.setAdapter(adapter);
+        recyclerView.addOnLayoutChangeListener(this);
         sendBtn.setOnClickListener(this);
         Utility utility = Utility.getInstance();
         chatRef = FirebaseDatabase.getInstance().getReference(getString(R.string.USER_CHAT_REF)+"/"+utility.getChatUserId(currentUserid,chatUserid));
 
+    }
+
+    @Override
+    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+        if(bottom < oldBottom){
+            recyclerView.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    recyclerView.scrollToPosition(recyclerView.getAdapter().getItemCount()-1);
+                }
+            },100);
+        }
     }
 
     private void loadMessages(){
@@ -129,6 +142,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         super.onStop();
         if(chatRef != null)
             chatRef.removeEventListener(this);
+
+        if(recyclerView != null)
+            recyclerView.removeOnLayoutChangeListener(this);
     }
 
     @Override
