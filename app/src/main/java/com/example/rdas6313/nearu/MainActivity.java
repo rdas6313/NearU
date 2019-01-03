@@ -96,10 +96,11 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     }
 
     @Override
-    public void onChatBtnCliked(String currentUserid, String chatUserid) {
+    public void onChatBtnCliked(String currentUserid, String chatUserid,String chatUsername) {
         Bundle bundle = new Bundle();
         bundle.putString(getString(R.string.CURRENT_USER_ID),currentUserid);
         bundle.putString(getString(R.string.CHAT_USER_ID),chatUserid);
+        bundle.putString(getString(R.string.CHAT_USER_NAME),chatUsername);
         Intent intent = new Intent(this,ChatActivity.class);
         intent.putExtras(bundle);
         startActivity(intent);

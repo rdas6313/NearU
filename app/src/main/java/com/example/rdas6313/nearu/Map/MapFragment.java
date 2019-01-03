@@ -255,11 +255,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
 
     private void openChatWindow(String userKey){
         //Todo:- open chat fragment here
-        Log.d(TAG,"open Chat window "+userKey);
         Utility utility = Utility.getInstance();
-        if(mainActivityConnector == null || !utility.isUserLoggedIn())
+        if(mainActivityConnector == null || !utility.isUserLoggedIn() || userData == null || !userData.containsKey(userKey))
             return;
-        mainActivityConnector.onChatBtnCliked(utility.getUserId(),userKey);
+        User user = userData.get(userKey);
+        mainActivityConnector.onChatBtnCliked(utility.getUserId(),userKey,user.getName());
     }
 
     @SuppressWarnings("MissingPermission")

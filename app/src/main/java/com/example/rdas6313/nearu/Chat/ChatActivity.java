@@ -28,7 +28,7 @@ import java.util.HashMap;
 public class ChatActivity extends AppCompatActivity implements View.OnClickListener,ChildEventListener,View.OnLayoutChangeListener {
 
 
-    private String currentUserid,chatUserid;
+    private String currentUserid,chatUserid,chatUsername;
 
     private Button sendBtn;
     private EditText inputEditText;
@@ -50,8 +50,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
         ActionBar actionBar = getSupportActionBar();
-        if(actionBar != null)
-            actionBar.setDisplayHomeAsUpEnabled(true);
         Intent intent = getIntent();
         if(intent == null || intent.getExtras() == null)
             return;
@@ -60,6 +58,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             return;
         currentUserid = bundle.getString(getString(R.string.CURRENT_USER_ID));
         chatUserid = bundle.getString(getString(R.string.CHAT_USER_ID));
+        chatUsername = bundle.getString(getString(R.string.CHAT_USER_NAME));
+        if(actionBar != null){
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setTitle(chatUsername);
+        }
         init();
         loadMessages();
     }
