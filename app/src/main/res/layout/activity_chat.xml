@@ -18,6 +18,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
+        android:singleLine="true"
         android:id="@+id/chatinput"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
