@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -44,6 +45,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     private static final String TAG = ChatActivity.class.getSimpleName();
 
+    private long totalMsg = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,9 +103,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-        Log.e(TAG,dataSnapshot.toString());
-        if(dataSnapshot.getValue() == null)
+        if(dataSnapshot.getValue() == null || totalMsg>0) {
+            totalMsg--;
             return;
+        }
+        Log.e(TAG,dataSnapshot.toString());
         String receiverId = dataSnapshot.child(getString(R.string.RECEIVER_ID)).getValue(String.class);
         String senderId = dataSnapshot.child(getString(R.string.SENDER_ID)).getValue(String.class);
         String msg = dataSnapshot.child(getString(R.string.CHAT_MSG)).getValue(String.class);
@@ -130,7 +134,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         Utility utility = Utility.getInstance();
         String msg = inputEditText.getText().toString();
-        if(!utility.isMsgOk(msg)){
+        if(TextUtils.isEmpty(msg)){
             return;
         }
         inputEditText.getText().clear();
@@ -160,6 +164,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             recyclerView.removeOnLayoutChangeListener(this);
 
         registerListenerAgain = true;
+        totalMsg = adapter.getItemCount();
     }
 
     @Override
