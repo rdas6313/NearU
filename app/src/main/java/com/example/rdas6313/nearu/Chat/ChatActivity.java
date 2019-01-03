@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.rdas6313.nearu.R;
 import com.example.rdas6313.nearu.Utility;
@@ -125,6 +126,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         if(!utility.isMsgOk(msg)){
             return;
         }
+        inputEditText.getText().clear();
         HashMap<String,Object> data = new HashMap<>();
         data.put(getString(R.string.RECEIVER_ID),chatUserid);
         data.put(getString(R.string.SENDER_ID),currentUserid);
@@ -133,8 +135,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         chatRef.push().updateChildren(data, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
-                if(databaseError != null)
-                    Log.e(TAG,databaseError.getDetails());
+                if(databaseError != null) {
+                    Log.e(TAG, databaseError.getDetails());
+                    Toast.makeText(ChatActivity.this,"Unable to send Message",Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
