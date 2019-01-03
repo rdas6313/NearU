@@ -2,6 +2,7 @@ package com.example.rdas6313.nearu.Chat;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
 
     private String loggedInUserId;
     private ArrayList<Message>messages;
+
+    private final int LEFT_VIEW = 0;
+    private final int RIGHT_VIEW = 1;
+
+    private final String TAG = RecyclerAdapter.class.getName();
 
     public RecyclerAdapter(String loggedInUserId){
         messages = new ArrayList<>();
@@ -42,20 +48,24 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
         Message message = messages.get(position);
         if(message == null)
             return -1;
-        if(message.getSenderId() == loggedInUserId)
-            return 1;
+        Log.d(TAG,message.getSenderId()+" "+loggedInUserId);
+        if(message.getSenderId().equals(loggedInUserId))
+            return RIGHT_VIEW;
         else
-            return 0;
+            return LEFT_VIEW;
     }
 
     @NonNull
     @Override
     public RecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         View root = null;
-        if(viewType == 1)
+        Log.d(TAG,"View type "+viewType);
+        if(viewType == RIGHT_VIEW)
             root = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.msg_sender_layout,viewGroup,false);
-        else
+        else if(viewType == LEFT_VIEW)
             root = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.msg_reciver_layout,viewGroup,false);
+        else
+            return null;
 
         RecyclerViewHolder viewHolder = new RecyclerViewHolder(root);
         return viewHolder;

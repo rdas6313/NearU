@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="8dp"
-    android:paddingBottom="16dp"
-    android:paddingLeft="16dp"
-    android:paddingRight="8dp"
-    android:layout_gravity="end"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:background="@android:color/holo_orange_light">
+    android:paddingTop="2dp"
+    android:paddingBottom="2dp"
+    android:paddingLeft="8dp"
+    android:paddingRight="2dp"
+    android:layout_margin="4dp"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <TextView
+        android:maxWidth="320dp"
+        android:padding="8dp"
+        android:background="@android:color/holo_orange_light"
         android:textSize="16sp"
         android:textColor="@android:color/black"
         android:id="@+id/msg"
@@ -25,14 +27,12 @@
         tools:text="Hey there! myself raja.how are u bro?" />
 
     <TextView
-        android:textSize="14sp"
-        android:textColor="@android:color/background_dark"
         android:id="@+id/timeAndDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
+        android:textColor="@android:color/background_dark"
+        android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="@+id/msg"
         app:layout_constraintTop_toBottomOf="@+id/msg"
         tools:text="2:04 pm,01/01/2018" />
