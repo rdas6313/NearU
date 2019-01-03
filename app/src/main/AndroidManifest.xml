@@ -24,13 +24,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" android:theme="@style/AppTheme" />
+        <activity android:name=".MainActivity" android:theme="@style/AppTheme"
+            android:launchMode="singleTop"/>
 
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="64e4979b3c16d352147c23fefb4997f79f53c963" />
 
-        <activity android:name=".Chat.ChatActivity" android:theme="@style/AppTheme_ActionBar"></activity>
+        <activity android:name=".Chat.ChatActivity" android:theme="@style/AppTheme_ActionBar"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+
+        </activity>
     </application>
 
 </manifest>
