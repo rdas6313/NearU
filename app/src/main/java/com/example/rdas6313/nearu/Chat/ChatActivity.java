@@ -38,6 +38,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     private DatabaseReference chatRef;
 
+    private boolean registerListenerAgain = false;
+
     private static final String TAG = ChatActivity.class.getSimpleName();
 
 
@@ -145,10 +147,19 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         if(recyclerView != null)
             recyclerView.removeOnLayoutChangeListener(this);
+
+        registerListenerAgain = true;
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        if(registerListenerAgain){
+            if(chatRef != null)
+                chatRef.addChildEventListener(this);
+            if(recyclerView != null)
+                recyclerView.addOnLayoutChangeListener(this);
+            registerListenerAgain = false;
+        }
     }
 }
