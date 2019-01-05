@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.rdas6313.nearu.R;
+import com.example.rdas6313.nearu.Utility;
 
 import java.util.ArrayList;
 
@@ -105,7 +106,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
             if(message == null)
                 return;
             msgView.setText(message.getMsg());
-            timeAndDateView.setText(message.getTimestamp()+"");
+            Utility utility = Utility.getInstance();
+            timeAndDateView.setText(utility.getDateFromTimeStamp(message.getTimestamp()));
         }
 
     }

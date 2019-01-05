@@ -1,5 +1,7 @@
 package com.example.rdas6313.nearu;
 
+import android.util.Log;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.mapbox.mapboxsdk.annotations.Marker;
@@ -10,7 +12,11 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 
 public final class Utility {
 
@@ -120,6 +126,23 @@ public final class Utility {
         if(msg == null || msg.length() == 0)
             return false;
         return true;
+    }
+
+    public String getDateFromTimeStamp(long timestamp){
+        Calendar calendar = Calendar.getInstance();
+        TimeZone timeZone = calendar.getTimeZone();
+        String pattern = "dd/MM/yyyy";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        simpleDateFormat.setTimeZone(timeZone);
+        String serverDate = simpleDateFormat.format(new Date(timestamp));
+        String todayDate = simpleDateFormat.format(calendar.getTime());
+        if(!serverDate.equals(todayDate))
+            pattern = "h:mm a, dd/MM/yyyy";
+        else
+            pattern = "h:mm a";
+        SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
+        dateFormat.setTimeZone(timeZone);
+        return dateFormat.format(new Date(timestamp));
     }
 
 }
