@@ -158,6 +158,7 @@ public class SignUpActivity extends AppCompatActivity implements SignUpCallback 
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
+                            Log.d(TAG,"Saving User Name");
                             saveUserName();
                         }else{
                             Log.d(TAG,task.getException().getMessage());
@@ -197,7 +198,9 @@ public class SignUpActivity extends AppCompatActivity implements SignUpCallback 
             Log.e(TAG,"There is some problem in SaveUserName Method.User not logged in.");
             return;
         }
-         user.updateProfile(profileUpdates)
+        saveUserDataToDatabase(userName,user);
+        return;
+       /*  user.updateProfile(profileUpdates)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
@@ -210,20 +213,25 @@ public class SignUpActivity extends AppCompatActivity implements SignUpCallback 
                             Log.e(TAG,task.getException().getMessage());
                         }
                     }
-                });
+                });*/
     }
 
     private void saveUserDataToDatabase(String name,FirebaseUser user){
-        if(user == null)
+        if(user == null) {
+            Log.d(TAG,"User is null");
             return;
+        }
         String path = getString(R.string.USER_DATA_KEY)+"/"+user.getUid();
+        Log.d(TAG,"Path "+path);
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(path).child(getString(R.string.USER_NAME_KEY));
         reference.setValue(name)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
+                        Log.d(TAG,"Saving User Data To Database");
                         if(!task.isSuccessful()){
                             Log.e(TAG,task.getException().getMessage());
+                            return;
                         }
                         open();
                     }

@@ -51,6 +51,8 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import static android.app.Activity.RESULT_OK;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -96,6 +98,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
 
     private FragmentCallback mainActivityConnector;
 
+    private DatabaseReference currentLocationRef;
+
     public MapFragment() {
         // Required empty public constructor
     }
@@ -117,7 +121,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mapView.onCreate(savedInstanceState);
-        mapView.getMapAsync(this);
         utility = Utility.getInstance();
         mainActivityConnector = (FragmentCallback) getActivity();
     }
@@ -127,7 +130,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
         if (PermissionUtils.isPermissionGranted(getContext())) {
             //granted
             initLocation();
-            isLocationPermissionGranted = true;
         } else {
             permissionManager = new PermissionUtils(this);
             permissionManager.requestLocationPermission(this);
@@ -158,7 +160,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
     public void onPermissionResult(boolean isGranted) {
         if (isGranted) {
             initLocation();
-            isLocationPermissionGranted = true;
         } else {
             showDialog();
         }
@@ -206,13 +207,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
 
 
     private void initLocation() {
-        //load Current user Location From Server
-        loadCurrentUserLocationFromServer();
-
-        initLocationEngine();
-        initLocationComponent();
-        if (!isGpsEnabled())
+        if (!isGpsEnabled()) {
             enableGps();
+            return;
+        }
+        //load Current user Location From Server
+        initLocationComponent();
+        loadCurrentUserLocationFromServer();
+        initLocationEngine();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG,"Activity Result "+requestCode+" "+resultCode);
+        initLocation();
     }
 
     @Override
@@ -270,6 +279,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
             locationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);
             locationEngine.addLocationEngineListener(this);
             locationEngine.activate();
+        }else{
+            locationEngine.addLocationEngineListener(this);
+            locationEngine.requestLocationUpdates();
         }
         Log.d(TAG, locationEngine.obtainType().name());
         Location location = locationEngine.getLastLocation();
@@ -293,13 +305,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
     private void enableGps() {
         gpsSettingsOn = true;
         Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-        startActivity(intent);
+        startActivityForResult(intent,2132);
     }
 
     @SuppressWarnings("MissingPermission")
     private void initLocationComponent() {
         if (map == null)
             return;
+        Log.d(TAG,"InitLocationComponent");
         locationComponent = map.getLocationComponent();
         locationComponent.activateLocationComponent(getContext());
         locationComponent.setLocationComponentEnabled(true);
@@ -345,10 +358,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
             geoQuery.addGeoQueryEventListener(this);
         }else{ // for update query
             geoQuery.setLocation(new GeoLocation(location.getLatitude(),location.getLongitude()),radius);
-            /*initUserDataList();
-            userData.clear();
-            if(map != null)
-                map.clear();*/
+
         }
     }
 
@@ -483,32 +493,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
     public void onStart() {
         super.onStart();
         Log.d(TAG, "OnStart");
-        if (shouldCheckPermission) {
-            checkLocationPermission();
-            shouldCheckPermission = false;
-        }
 
-        if (gpsSettingsOn) {
-            gpsSettingsOn = false;
-            if (!isGpsEnabled()) {
-                enableGps();
-            }
-        }
-
-        if (locationComponent != null) {
-            locationComponent.onStart();
-        }
-        if (locationEngine != null) {
-            locationEngine.addLocationEngineListener(this);
-            locationEngine.requestLocationUpdates();
-        }
-
-        if (geoQuery != null)
-            geoQuery.addGeoQueryEventListener(this);
+        if(mapView != null)
+            mapView.getMapAsync(this);
 
         if (mapView != null)
             mapView.onStart();
 
+        if (locationComponent != null) {
+            locationComponent.onStart();
+        }
+
+        if (geoQuery != null)
+            geoQuery.addGeoQueryEventListener(this);
 
     }
 
@@ -538,6 +535,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
             locationEngine.removeLocationEngineListener(this);
             locationEngine.removeLocationUpdates();
         }
+
+        if(locationComponent != null)
+            locationComponent.onStop();
+
         if (geoQuery != null)
             geoQuery.removeAllListeners();
 
@@ -557,6 +558,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
         }
         if(map != null)
             map.clear();
+
+        if(currentLocationRef != null)
+            currentLocationRef.removeEventListener(singleEventListener);
     }
 
     @Override
@@ -589,34 +593,36 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
             Log.d(TAG,"user not logged in");
             return;
         }
-        DatabaseReference currentLocationRef = FirebaseDatabase.getInstance().getReference(getString(R.string.USER_DATA_KEY)+"/"+utility.getUserId()+"/"+getString(R.string.USER_LAST_LOCATION_KEY));
-        currentLocationRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Log.d(TAG,dataSnapshot.toString());
-
-                if(gotCurrentLocation || dataSnapshot.getValue() == null)
-                    return;
-
-                double lat =  dataSnapshot.child(getString(R.string.LATITUDE)).getValue(Double.class);
-                double lng = dataSnapshot.child(getString(R.string.LONGITUDE)).getValue(Double.class);
-                Log.e(TAG,lat+" "+lng);
-                currentLocation = new Location(LocationManager.PASSIVE_PROVIDER);
-                currentLocation.setLatitude(lat);
-                currentLocation.setLongitude(lng);
-                initGeofire();
-                if(map != null)
-                    map.getLocationComponent().forceLocationUpdate(currentLocation);
-                //Todo:- comment these lines
-                sendLocationDataToServer(currentLocation);
-                loadUserLocation(currentLocation,SEARCH_USER_RADIUS);
-                onDisconnect();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.e(TAG,databaseError.getDetails());
-            }
-        });
+        Log.d(TAG,"Loading Current User Location From Server");
+        currentLocationRef = FirebaseDatabase.getInstance().getReference(getString(R.string.USER_DATA_KEY)+"/"+utility.getUserId()+"/"+getString(R.string.USER_LAST_LOCATION_KEY));
+        currentLocationRef.addListenerForSingleValueEvent(singleEventListener);
     }
+
+    private ValueEventListener singleEventListener = new ValueEventListener() { //Todo:- detach this listener
+        @Override
+        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            if(gotCurrentLocation || dataSnapshot.getValue() == null)
+                return;
+
+            Log.d(TAG,"Loading  "+dataSnapshot.toString());
+            double lat =  dataSnapshot.child(getString(R.string.LATITUDE)).getValue(Double.class);
+            double lng = dataSnapshot.child(getString(R.string.LONGITUDE)).getValue(Double.class);
+            Log.e(TAG,lat+" "+lng);
+            currentLocation = new Location(LocationManager.PASSIVE_PROVIDER);
+            currentLocation.setLatitude(lat);
+            currentLocation.setLongitude(lng);
+            initGeofire();
+            if(map != null)
+                map.getLocationComponent().forceLocationUpdate(currentLocation);
+            //Todo:- comment these lines
+            sendLocationDataToServer(currentLocation);
+            loadUserLocation(currentLocation,SEARCH_USER_RADIUS);
+            onDisconnect();
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError databaseError) {
+            Log.e(TAG,databaseError.getDetails());
+        }
+    };
 }
