@@ -6,44 +6,62 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".SignUp.OtpVerificationFragment">
 
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="60dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:maxWidth="320dp"
+        android:text="We have sent a confirmation code to your mobile ,please enter that here"
+        android:textColor="@android:color/black"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <com.mukesh.OtpView
         android:id="@+id/otp_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginTop="172dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:inputType="number"
-        android:itemBackground="@color/colorPrimary"
-        android:textColor="@android:color/white"
+        android:textColor="@android:color/black"
         app:itemCount="6"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.509"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:lineColor="@color/colorPrimary"
-        app:viewType="rectangle" />
+        app:layout_constraintTop_toBottomOf="@+id/textView3"
+        app:lineColor="#388E3C"
+        app:viewType="line" />
 
     <Button
         android:id="@+id/submit"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
-        android:background="@android:color/holo_blue_light"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/btn_background"
         android:padding="16dp"
-        android:text="Submit"
+        android:text="Veify Confirmation Code"
+        android:textColor="@android:color/white"
         app:layout_constraintEnd_toEndOf="@+id/otp_view"
-        app:layout_constraintHorizontal_bias="0.507"
         app:layout_constraintStart_toStartOf="@+id/otp_view"
         app:layout_constraintTop_toBottomOf="@+id/otp_view" />
 
-
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        app:layout_constraintEnd_toEndOf="@+id/submit"
+        app:layout_constraintStart_toStartOf="@+id/submit"
+        app:layout_constraintTop_toBottomOf="@+id/submit" />
 
 </android.support.constraint.ConstraintLayout>

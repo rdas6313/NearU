@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.rdas6313.nearu.R;
@@ -20,6 +21,7 @@ public class OtpVerificationFragment extends Fragment implements View.OnClickLis
 
     private Button submitButton;
     private OtpView otpView;
+    private ProgressBar progressBar;
 
     private boolean shouldresendSms = false;
 
@@ -39,6 +41,7 @@ public class OtpVerificationFragment extends Fragment implements View.OnClickLis
         View root = inflater.inflate(R.layout.fragment_otp_verification, container, false);
         submitButton = (Button)root.findViewById(R.id.submit);
         otpView = (OtpView)root.findViewById(R.id.otp_view);
+        progressBar = (ProgressBar)root.findViewById(R.id.progressBar);
         return root;
     }
 
@@ -46,13 +49,16 @@ public class OtpVerificationFragment extends Fragment implements View.OnClickLis
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         submitButton.setOnClickListener(this);
-
+        progressBar.setVisibility(View.GONE);
+        submitButton.setEnabled(true);
         mCallback = (SignUpCallback) getActivity();
     }
 
     private void onHaveOtp(String otp){
         if(mCallback == null)
             return;
+        progressBar.setVisibility(View.VISIBLE);
+        submitButton.setEnabled(false);
         mCallback.onGetOtp(otp);
     }
 
@@ -84,7 +90,9 @@ public class OtpVerificationFragment extends Fragment implements View.OnClickLis
     }
 
     public void onInvalidCode(){
-        Toast.makeText(getContext(),"InValid Otp",Toast.LENGTH_SHORT).show();
+        progressBar.setVisibility(View.GONE);
+        submitButton.setEnabled(true);
+        Toast.makeText(getContext(),"Invalid Otp",Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -96,8 +104,9 @@ public class OtpVerificationFragment extends Fragment implements View.OnClickLis
                 changeSubmitButtonType(true);
             }else{
                 String code = otpView.getText().toString();
-                if(isEverythingOk(code))
+                if(isEverythingOk(code)) {
                     onHaveOtp(code);
+                }
                 else
                     otpView.setError("Enter valid otp");
             }
