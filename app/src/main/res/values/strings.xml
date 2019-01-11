@@ -35,4 +35,7 @@
     <string name="CHAT_TIMESTAMP">timestamp</string>
     <string name="CHAT_DATA">chat_data</string>
     <string name="CHAT_USER_NAME">chat_user_name</string>
+    <string name="USER_THREADS">user_threads/</string>
+    <string name="RECEIVER_NAME">receiver_name</string>
+    <string name="TOOLBAR_TITLE">Recent Connections</string>
 </resources>

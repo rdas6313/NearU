@@ -145,4 +145,29 @@ public final class Utility {
         return dateFormat.format(new Date(timestamp));
     }
 
+    public String getFirstLetterFromName(String name){
+        if(name == null || name.length() == 0)
+            return null;
+        return name.substring(0,1);
+    }
+
+    public String getDate(long timestamp){
+        Calendar calendar = Calendar.getInstance();
+        TimeZone timeZone = calendar.getTimeZone();
+        String pattern = "dd/MM/yyyy";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        simpleDateFormat.setTimeZone(timeZone);
+        return simpleDateFormat.format(new Date(timestamp));
+    }
+
+    public String getTime(long timestamp){
+        Calendar calendar = Calendar.getInstance();
+        TimeZone timeZone = calendar.getTimeZone();
+        String pattern = "h:mm a";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        simpleDateFormat.setTimeZone(timeZone);
+        return simpleDateFormat.format(new Date(timestamp));
+
+    }
+
 }

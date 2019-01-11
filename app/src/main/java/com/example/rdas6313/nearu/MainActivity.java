@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 loadFragments(new MapFragment());
                 return true;
             case R.id.frnds:
-                loadFragments(new FrndsFragment());
+                loadFragments(new ChatThreads());
                 return true;
             case R.id.profile:
                 loadFragments(new ProfileFragment());

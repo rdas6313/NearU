@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="16dp"
+    android:layout_marginTop="2dp"
+    android:layout_marginBottom="2dp"
+    android:background="@android:color/white"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <ImageView
+        android:id="@+id/Img"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:src="@drawable/circle_background" />
+
+    <TextView
+        android:id="@+id/ImageText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="@+id/Img"
+        app:layout_constraintEnd_toEndOf="@+id/Img"
+        app:layout_constraintStart_toStartOf="@+id/Img"
+        app:layout_constraintTop_toTopOf="@+id/Img"
+        tools:text="R" />
+
+    <TextView
+        android:textColor="@android:color/black"
+        android:id="@+id/titleName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginLeft="24dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        app:layout_constraintStart_toEndOf="@+id/Img"
+        app:layout_constraintTop_toTopOf="@+id/Img"
+        tools:text="Raja" />
+
+    <TextView
+
+        android:id="@+id/lastmsg"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="24dp"
+        android:layout_marginRight="24dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:layout_constraintBottom_toBottomOf="@+id/Img"
+        app:layout_constraintEnd_toStartOf="@+id/thread_date"
+        app:layout_constraintStart_toStartOf="@+id/titleName"
+        app:layout_constraintTop_toBottomOf="@+id/titleName"
+        tools:text="Hi there!aaaaaaww" />
+
+    <TextView
+        android:id="@+id/thread_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/Img"
+        tools:text="2:45 pm" />
+
+    <TextView
+        android:id="@+id/thread_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+        app:layout_constraintBottom_toBottomOf="@+id/Img"
+        app:layout_constraintEnd_toEndOf="@+id/thread_time"
+        app:layout_constraintTop_toBottomOf="@+id/thread_time"
+        tools:text="2/12/2018" />
+
+</android.support.constraint.ConstraintLayout>
