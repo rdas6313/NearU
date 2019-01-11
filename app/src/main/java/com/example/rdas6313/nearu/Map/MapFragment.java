@@ -595,12 +595,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
         }
         Log.d(TAG,"Loading Current User Location From Server");
         currentLocationRef = FirebaseDatabase.getInstance().getReference(getString(R.string.USER_DATA_KEY)+"/"+utility.getUserId()+"/"+getString(R.string.USER_LAST_LOCATION_KEY));
-        currentLocationRef.addListenerForSingleValueEvent(singleEventListener);
+        currentLocationRef.addValueEventListener(singleEventListener);
     }
 
     private ValueEventListener singleEventListener = new ValueEventListener() { //Todo:- detach this listener
         @Override
         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            if(currentLocationRef != null)
+                currentLocationRef.removeEventListener(singleEventListener);
             if(gotCurrentLocation || dataSnapshot.getValue() == null)
                 return;
 

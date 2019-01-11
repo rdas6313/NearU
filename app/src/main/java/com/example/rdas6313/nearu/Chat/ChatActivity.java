@@ -132,21 +132,36 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        Utility utility = Utility.getInstance();
         String msg = inputEditText.getText().toString();
         if(TextUtils.isEmpty(msg)){
             return;
         }
         inputEditText.getText().clear();
+        sendChatDataToServer(msg);
+    }
+
+    private void sendChatDataToServer(String msg){
+        if(chatRef == null || msg == null || msg.length() == 0)
+            return;
+
         HashMap<String,Object> data = new HashMap<>();
         data.put(getString(R.string.RECEIVER_ID),chatUserid);
         data.put(getString(R.string.SENDER_ID),currentUserid);
+        data.put(getString(R.string.RECEIVER_NAME),chatUsername);
         data.put(getString(R.string.CHAT_MSG),msg.trim());
         data.put(getString(R.string.CHAT_TIMESTAMP),ServerValue.TIMESTAMP);
-        chatRef.push().updateChildren(data, new DatabaseReference.CompletionListener() {
+
+        String senderPath = getString(R.string.USER_THREADS)+currentUserid+"/"+chatUserid+"/";
+        String receiverPath = getString(R.string.USER_THREADS)+chatUserid+"/"+currentUserid+"/";
+        String chatPath = chatRef.getPath().toString()+"/"+chatRef.push().getKey();
+        HashMap<String,Object>updateUserChatPath = new HashMap<>();
+        updateUserChatPath.put(senderPath,data);
+        updateUserChatPath.put(receiverPath,data);
+        updateUserChatPath.put(chatPath,data);
+        FirebaseDatabase.getInstance().getReference().updateChildren(updateUserChatPath, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
-                if(databaseError != null) {
+                if(databaseError != null){
                     Log.e(TAG, databaseError.getDetails());
                     Toast.makeText(ChatActivity.this,"Unable to send Message",Toast.LENGTH_SHORT).show();
                 }

@@ -78,7 +78,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Recycl
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerViewHolder recyclerViewHolder, int pos) {
-        if(messages == null || pos < 0 || pos > messages.size())
+        if(messages == null || pos < 0 || pos >= messages.size())
             return;
         Message message = messages.get(pos);
         recyclerViewHolder.setData(message);
