@@ -1,12 +1,14 @@
-package com.example.rdas6313.nearu;
+package com.example.rdas6313.nearu.MessageThreads;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.example.rdas6313.nearu.R;
+import com.example.rdas6313.nearu.Utility;
 
 import java.util.ArrayList;
 
@@ -14,9 +16,17 @@ public class ThreadsAdapter extends RecyclerView.Adapter<ThreadsAdapter.ThreadsV
 
     private static final String TAG = ThreadsAdapter.class.getName();
     private ArrayList<ThreadData>data;
+    private ThreadsClickListener mListener;
 
-    public ThreadsAdapter(){
+    public ThreadsAdapter(ThreadsClickListener listener){
         data = new ArrayList<>();
+        mListener = listener;
+    }
+
+    public void clearData(){
+        if(data == null)
+            return;
+        data.clear();
     }
 
     public void add(ThreadData threadData){
@@ -24,6 +34,12 @@ public class ThreadsAdapter extends RecyclerView.Adapter<ThreadsAdapter.ThreadsV
             return;
         data.add(0,threadData);
         notifyDataSetChanged();
+    }
+
+    public ThreadData getThreadDataFromPos(int pos){
+        if(data == null || pos < 0 || pos >= data.size())
+            return null;
+        return data.get(pos);
     }
 
     private int getPosFromKey(String key){
@@ -52,7 +68,7 @@ public class ThreadsAdapter extends RecyclerView.Adapter<ThreadsAdapter.ThreadsV
     @Override
     public ThreadsViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View root = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.threads_item_layout,viewGroup,false);
-        ThreadsViewHolder viewHolder = new ThreadsViewHolder(root);
+        ThreadsViewHolder viewHolder = new ThreadsViewHolder(root,mListener);
         return viewHolder;
     }
 
@@ -71,17 +87,28 @@ public class ThreadsAdapter extends RecyclerView.Adapter<ThreadsAdapter.ThreadsV
         return data.size();
     }
 
-    public static class ThreadsViewHolder extends RecyclerView.ViewHolder{
+    public static class ThreadsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         private TextView nameView,msgView,ImageTextView,dateView,timeView;
+        private ThreadsClickListener mListener;
 
-        public ThreadsViewHolder(View v){
+        public ThreadsViewHolder(View v,ThreadsClickListener listener){
             super(v);
+            mListener = listener;
             nameView = (TextView)v.findViewById(R.id.titleName);
             msgView = (TextView)v.findViewById(R.id.lastmsg);
             ImageTextView = (TextView)v.findViewById(R.id.ImageText);
             dateView = (TextView)v.findViewById(R.id.thread_date);
             timeView = (TextView)v.findViewById(R.id.thread_time);
+            v.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            if(mListener == null)
+                return;
+            int pos = getAdapterPosition();
+            mListener.onChatItemClick(pos);
         }
 
         public void setData(ThreadData threadData){

@@ -13,6 +13,7 @@ import com.crashlytics.android.Crashlytics;
 import com.example.rdas6313.nearu.Chat.ChatActivity;
 import com.example.rdas6313.nearu.Map.FragmentCallback;
 import com.example.rdas6313.nearu.Map.MapFragment;
+import com.example.rdas6313.nearu.MessageThreads.ChatThreads;
 import com.example.rdas6313.nearu.SignUp.SignUpActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;

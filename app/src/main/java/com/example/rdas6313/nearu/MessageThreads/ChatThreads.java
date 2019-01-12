@@ -1,4 +1,4 @@
-package com.example.rdas6313.nearu;
+package com.example.rdas6313.nearu.MessageThreads;
 
 
 import android.graphics.Color;
@@ -14,6 +14,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.rdas6313.nearu.Map.FragmentCallback;
+import com.example.rdas6313.nearu.R;
+import com.example.rdas6313.nearu.Utility;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -25,7 +28,7 @@ import com.google.firebase.database.Query;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ChatThreads extends Fragment implements ChildEventListener {
+public class ChatThreads extends Fragment implements ChildEventListener,ThreadsClickListener{
 
     private DatabaseReference threadRef;
     private RecyclerView recyclerView;
@@ -34,8 +37,7 @@ public class ChatThreads extends Fragment implements ChildEventListener {
 
     private Toolbar toolbar;
 
-    private int totalThreads = 0;
-
+    private FragmentCallback fragmentCallback;
     private final static String TAG = ChatThreads.class.getSimpleName();
 
     public ChatThreads() {
@@ -56,16 +58,29 @@ public class ChatThreads extends Fragment implements ChildEventListener {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        fragmentCallback = (FragmentCallback) getActivity();
+
         Utility utility = Utility.getInstance();
         threadRef = FirebaseDatabase.getInstance().getReference(getString(R.string.USER_THREADS)+utility.getUserId());
         threadQuery = threadRef.orderByChild(getString(R.string.CHAT_TIMESTAMP));
-        threadsAdapter = new ThreadsAdapter();
+        threadsAdapter = new ThreadsAdapter(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(threadsAdapter);
 
         /*Setting Toolbar text and color here */
         toolbar.setTitle(R.string.TOOLBAR_TITLE);
         toolbar.setTitleTextColor(Color.WHITE);
+    }
+
+    @Override
+    public void onChatItemClick(int pos) {
+        Utility utility = Utility.getInstance();
+        if(threadsAdapter == null || !utility.isUserLoggedIn())
+            return;
+        ThreadData threadData = threadsAdapter.getThreadDataFromPos(pos);
+        if(fragmentCallback != null)
+            fragmentCallback.onChatBtnCliked(utility.getUserId(),threadData.getKey(),threadData.getReceiverName());
     }
 
     private ThreadData makeThreadDataObject(DataSnapshot dataSnapshot){
@@ -82,9 +97,8 @@ public class ChatThreads extends Fragment implements ChildEventListener {
 
     @Override
     public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-        if(dataSnapshot.getValue() == null || totalThreads>0) {
-            if(totalThreads > 0)
-                totalThreads-=1;
+        Log.d(TAG,"Child Added");
+        if(dataSnapshot.getValue() == null) {
             return;
         }
         ThreadData threadData = makeThreadDataObject(dataSnapshot);
@@ -95,6 +109,7 @@ public class ChatThreads extends Fragment implements ChildEventListener {
 
     @Override
     public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+        Log.d(TAG,"Child Changed");
         if(dataSnapshot.getValue() == null)
             return;
         ThreadData threadData = makeThreadDataObject(dataSnapshot);
@@ -126,6 +141,6 @@ public class ChatThreads extends Fragment implements ChildEventListener {
         if(threadQuery != null)
             threadQuery.removeEventListener(this);
         if(threadsAdapter != null)
-            totalThreads = threadsAdapter.getItemCount();
+            threadsAdapter.clearData();
     }
 }

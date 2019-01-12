@@ -1,4 +1,4 @@
-package com.example.rdas6313.nearu;
+package com.example.rdas6313.nearu.MessageThreads;
 
 public class ThreadData {
     private String msg,receiver_id,sender_id,receiver_name,key;
