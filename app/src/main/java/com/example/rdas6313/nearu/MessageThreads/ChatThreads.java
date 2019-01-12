@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.example.rdas6313.nearu.Map.FragmentCallback;
 import com.example.rdas6313.nearu.R;
@@ -32,6 +33,7 @@ public class ChatThreads extends Fragment implements ChildEventListener,ThreadsC
 
     private DatabaseReference threadRef;
     private RecyclerView recyclerView;
+    private ProgressBar progressBar;
     private ThreadsAdapter threadsAdapter;
     private Query threadQuery;
 
@@ -52,6 +54,7 @@ public class ChatThreads extends Fragment implements ChildEventListener,ThreadsC
         View root = inflater.inflate(R.layout.fragment_chat_threads, container, false);
         recyclerView = (RecyclerView)root.findViewById(R.id.recycleView);
         toolbar = (Toolbar)root.findViewById(R.id.toolBar);
+        progressBar = (ProgressBar)root.findViewById(R.id.recyclerviewProgressbar);
         return root;
     }
 
@@ -100,7 +103,11 @@ public class ChatThreads extends Fragment implements ChildEventListener,ThreadsC
         Log.d(TAG,"Child Added");
         if(dataSnapshot.getValue() == null) {
             return;
+        }else if(progressBar.getVisibility() == View.VISIBLE) {
+            progressBar.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
         }
+
         ThreadData threadData = makeThreadDataObject(dataSnapshot);
         if(threadsAdapter != null)
             threadsAdapter.add(threadData);
@@ -131,7 +138,9 @@ public class ChatThreads extends Fragment implements ChildEventListener,ThreadsC
     @Override
     public void onStart() {
         super.onStart();
-       if(threadQuery != null)
+        recyclerView.setVisibility(View.GONE);
+        progressBar.setVisibility(View.VISIBLE);
+        if(threadQuery != null)
            threadQuery.addChildEventListener(this);
     }
 
