@@ -57,7 +57,7 @@ import static android.app.Activity.RESULT_OK;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class MapFragment extends Fragment implements OnMapReadyCallback, PermissionUtilsListener, LocationEngineListener, GeoQueryEventListener,View.OnClickListener,MapboxMap.InfoWindowAdapter {
+public class MapFragment extends Fragment implements OnMapReadyCallback, PermissionUtilsListener, LocationEngineListener, GeoQueryEventListener,View.OnClickListener,MapboxMap.InfoWindowAdapter ,MapModelContract{
 
     private static final String TAG = MapFragment.class.getSimpleName();
 
@@ -100,6 +100,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
 
     private DatabaseReference currentLocationRef;
 
+    private MapModel mapModel;
+
     public MapFragment() {
         // Required empty public constructor
     }
@@ -123,6 +125,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
         mapView.onCreate(savedInstanceState);
         utility = Utility.getInstance();
         mainActivityConnector = (FragmentCallback) getActivity();
+        mapModel = MapModel.getInstance(getContext());
     }
 
     /* Permission Related Methods Start from here */
@@ -376,26 +379,26 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
 
     public void fetchUsersDataFromServer(User user){ // fetching Near By Users Data from Server
         Utility utility = Utility.getInstance();
-        if(!utility.isUserLoggedIn())
+        if(!utility.isUserLoggedIn() || user == null)
             return;
-        String path = getString(R.string.USER_DATA_KEY)+"/"+user.getId();
-        DatabaseReference userDataRef = FirebaseDatabase.getInstance().getReference(path);
-        userDataRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                user.setName(dataSnapshot.child(getString(R.string.NAME_KEY)).getValue(String.class));
-                Marker marker = utility.addMarkerToMap(user.getLocation(),user.getName(),"",map);
-                user.setMarker(marker);
-                if(markerData != null)
-                    markerData.put(marker.getId(),user.getId());
+        mapModel.fetchUserData(user.getId());
+    }
 
-            }
+    @Override
+    public void onFetchUserDataSuccess(DataSnapshot dataSnapshot) {
+        if(userData == null || dataSnapshot.getValue() == null)
+            return;
+        User user = userData.get(dataSnapshot.getKey());
+        user.setName(dataSnapshot.child(getString(R.string.NAME_KEY)).getValue(String.class));
+        Marker marker = utility.addMarkerToMap(user.getLocation(),user.getName(),"",map);
+        user.setMarker(marker);
+        if(markerData != null)
+            markerData.put(marker.getId(),user.getId());
+    }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.e(TAG,databaseError.getDetails());
-            }
-        });
+    @Override
+    public void onFetchUserDataError(DatabaseError databaseError) {
+        Log.e(TAG,databaseError.getDetails());
     }
 
     @Override
@@ -494,6 +497,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
         super.onStart();
         Log.d(TAG, "OnStart");
 
+        if(mapModel != null)
+            mapModel.setListener(this);
         if(mapView != null)
             mapView.getMapAsync(this);
 
@@ -528,6 +533,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
         super.onStop();
         Log.d(TAG,"onStop");
         shouldCheckPermission = true;
+        if(mapModel != null)
+            mapModel.setListener(null);
+
         if (mapView != null)
             mapView.onStop();
 
@@ -558,9 +566,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
         }
         if(map != null)
             map.clear();
-
-        if(currentLocationRef != null)
-            currentLocationRef.removeEventListener(singleEventListener);
     }
 
     @Override
@@ -594,37 +599,32 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
             return;
         }
         Log.d(TAG,"Loading Current User Location From Server");
-        currentLocationRef = FirebaseDatabase.getInstance().getReference(getString(R.string.USER_DATA_KEY)+"/"+utility.getUserId()+"/"+getString(R.string.USER_LAST_LOCATION_KEY));
-        currentLocationRef.addValueEventListener(singleEventListener);
+        if(mapModel != null)
+            mapModel.loadCurrentUserLocation(utility.getUserId());
     }
 
-    private ValueEventListener singleEventListener = new ValueEventListener() { //Todo:- detach this listener
-        @Override
-        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-            if(currentLocationRef != null)
-                currentLocationRef.removeEventListener(singleEventListener);
-            if(gotCurrentLocation || dataSnapshot.getValue() == null)
-                return;
+    @Override
+    public void onLoadCurrentUserLocationSuccess(DataSnapshot dataSnapshot) {
+        if(gotCurrentLocation || dataSnapshot.getValue() == null)
+            return;
 
-            Log.d(TAG,"Loading  "+dataSnapshot.toString());
-            double lat =  dataSnapshot.child(getString(R.string.LATITUDE)).getValue(Double.class);
-            double lng = dataSnapshot.child(getString(R.string.LONGITUDE)).getValue(Double.class);
-            Log.e(TAG,lat+" "+lng);
-            currentLocation = new Location(LocationManager.PASSIVE_PROVIDER);
-            currentLocation.setLatitude(lat);
-            currentLocation.setLongitude(lng);
-            initGeofire();
-            if(map != null)
-                map.getLocationComponent().forceLocationUpdate(currentLocation);
-            //Todo:- comment these lines
-            sendLocationDataToServer(currentLocation);
-            loadUserLocation(currentLocation,SEARCH_USER_RADIUS);
-            onDisconnect();
-        }
+        Log.d(TAG,"Loading  "+dataSnapshot.toString());
+        double lat =  dataSnapshot.child(getString(R.string.LATITUDE)).getValue(Double.class);
+        double lng = dataSnapshot.child(getString(R.string.LONGITUDE)).getValue(Double.class);
+        currentLocation = new Location(LocationManager.PASSIVE_PROVIDER);
+        currentLocation.setLatitude(lat);
+        currentLocation.setLongitude(lng);
+        initGeofire();
+        if(map != null)
+            map.getLocationComponent().forceLocationUpdate(currentLocation);
+        //Todo:- comment these lines
+        sendLocationDataToServer(currentLocation);
+        loadUserLocation(currentLocation,SEARCH_USER_RADIUS);
+        onDisconnect();
+    }
 
-        @Override
-        public void onCancelled(@NonNull DatabaseError databaseError) {
-            Log.e(TAG,databaseError.getDetails());
-        }
-    };
+    @Override
+    public void onLoadCurrentUserLocationError(DatabaseError databaseError) {
+        Log.e(TAG,databaseError.getDetails());
+    }
 }

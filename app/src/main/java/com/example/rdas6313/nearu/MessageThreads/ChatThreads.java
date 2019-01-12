@@ -100,7 +100,7 @@ public class ChatThreads extends Fragment implements ChildEventListener,ThreadsC
 
     @Override
     public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-        Log.d(TAG,"Child Added");
+    //    Log.d(TAG,"Child Added");
         if(dataSnapshot.getValue() == null) {
             return;
         }else if(progressBar.getVisibility() == View.VISIBLE) {
@@ -116,7 +116,7 @@ public class ChatThreads extends Fragment implements ChildEventListener,ThreadsC
 
     @Override
     public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-        Log.d(TAG,"Child Changed");
+    //    Log.d(TAG,"Child Changed");
         if(dataSnapshot.getValue() == null)
             return;
         ThreadData threadData = makeThreadDataObject(dataSnapshot);
