@@ -93,8 +93,9 @@ public class ChatThreads extends Fragment implements ChildEventListener,ThreadsC
         String msg = dataSnapshot.child(getString(R.string.CHAT_MSG)).getValue(String.class);
         String key = dataSnapshot.getKey();
         long timestamp = dataSnapshot.child(getString(R.string.CHAT_TIMESTAMP)).getValue(Long.class);
+        boolean is_msg_seen = dataSnapshot.child("seen").getValue(Boolean.class);
 
-        ThreadData threadData = new ThreadData(key,msg,receiverId,senderId,name,timestamp);
+        ThreadData threadData = new ThreadData(key,msg,receiverId,senderId,name,timestamp,is_msg_seen);
         return threadData;
     }
 

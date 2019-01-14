@@ -6,4 +6,5 @@
 
     <color name="nav_background">#fe485a</color>
     <color name="background_grey">#f5f5f5</color>
+    <color name="text_gray">#e0e0e0</color>
 </resources>

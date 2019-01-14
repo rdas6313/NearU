@@ -95,6 +95,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private void markMsgAsSeen(){
+        String loggedInUserPath = getString(R.string.USER_THREADS)+currentUserid+"/"+chatUserid+"/";
+        FirebaseDatabase.getInstance().getReference(loggedInUserPath)
+                .child(getString(R.string.CHAT_SEEN)).setValue(Boolean.TRUE);
+    }
+
     private void loadMessages(){
         if(chatRef == null)
             return;
@@ -150,6 +156,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         data.put(getString(R.string.RECEIVER_NAME),chatUsername);
         data.put(getString(R.string.CHAT_MSG),msg.trim());
         data.put(getString(R.string.CHAT_TIMESTAMP),ServerValue.TIMESTAMP);
+        data.put(getString(R.string.CHAT_SEEN),false);
 
         String senderPath = getString(R.string.USER_THREADS)+currentUserid+"/"+chatUserid+"/";
         String receiverPath = getString(R.string.USER_THREADS)+chatUserid+"/"+currentUserid+"/";
@@ -172,6 +179,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onStop() {
         super.onStop();
+
+        markMsgAsSeen();
+
         if(chatRef != null)
             chatRef.removeEventListener(this);
 

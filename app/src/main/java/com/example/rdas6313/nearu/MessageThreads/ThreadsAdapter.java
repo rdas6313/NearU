@@ -1,7 +1,10 @@
 package com.example.rdas6313.nearu.MessageThreads;
 
+import android.graphics.Color;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -120,6 +123,11 @@ public class ThreadsAdapter extends RecyclerView.Adapter<ThreadsAdapter.ThreadsV
             ImageTextView.setText(utility.getFirstLetterFromName(threadData.getReceiverName()));
             dateView.setText(utility.getDate(threadData.getTimestamp()));
             timeView.setText(utility.getTime(threadData.getTimestamp()));
+            if(!threadData.getSenderId().equals(utility.getUserId()) && !threadData.isMsgSeen()){
+                msgView.setTextColor(Color.RED);
+            }else{
+                msgView.setTextColor(Color.GRAY);
+            }
         }
     }
 }
