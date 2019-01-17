@@ -1,5 +1,7 @@
 package com.example.rdas6313.nearu;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -21,6 +23,8 @@ import java.util.TimeZone;
 public final class Utility {
 
     private static Utility mObj;
+    private final String SHARED_PREFERENCE_NAME = "settings_pref_file";
+    private final int SHARED_PREFERENCE_DEFAULT_VALUE = 1;
 
     public static Utility getInstance(){
         if(mObj == null)
@@ -168,6 +172,18 @@ public final class Utility {
         simpleDateFormat.setTimeZone(timeZone);
         return simpleDateFormat.format(new Date(timestamp));
 
+    }
+
+    public void saveDataToSharedPreference(Context context,String key,int value){
+        SharedPreferences sharedPreferences = context.getApplicationContext().getSharedPreferences(SHARED_PREFERENCE_NAME,Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(key,value);
+        editor.commit();
+    }
+
+    public int getProgressValueFromSharedPreference(Context context,String key){
+        SharedPreferences sharedPreferences = context.getApplicationContext().getSharedPreferences(SHARED_PREFERENCE_NAME,Context.MODE_PRIVATE);
+        return sharedPreferences.getInt(key,SHARED_PREFERENCE_DEFAULT_VALUE);
     }
 
 }

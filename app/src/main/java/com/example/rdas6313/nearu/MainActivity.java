@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 loadFragments(new ChatThreads());
                 return true;
             case R.id.profile:
-                loadFragments(new ProfileFragment());
+                loadFragments(new SettingsFragment());
                 return true;
             default:
                 return false;

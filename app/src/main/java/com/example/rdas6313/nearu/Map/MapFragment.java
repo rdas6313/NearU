@@ -62,7 +62,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
     private static final String TAG = MapFragment.class.getSimpleName();
 
     private static final int LOCATION_REQUEST_CODE = 2123;
-    private static final float SEARCH_USER_RADIUS = 1.0f; // in kilo meter
+    private float SEARCH_USER_RADIUS = 1.0f; // in kilo meter
     private static final double CAMERA_ZOOM_LEVEL = 12;
     private static final int ANIMATE_CAMERA_DURATION = 4000;
     private static final int CAMERA_PADDING = 10;
@@ -126,6 +126,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
         utility = Utility.getInstance();
         mainActivityConnector = (FragmentCallback) getActivity();
         mapModel = MapModel.getInstance(getContext());
+        SEARCH_USER_RADIUS = (float) utility.getProgressValueFromSharedPreference(getContext(),getString(R.string.SHARED_PREF_KEY));
+        Log.d(TAG,"SEARCH_RADIUS "+SEARCH_USER_RADIUS);
     }
 
     /* Permission Related Methods Start from here */
