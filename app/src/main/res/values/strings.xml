@@ -37,10 +37,10 @@
     <string name="CHAT_USER_NAME">chat_user_name</string>
     <string name="USER_THREADS">user_threads/</string>
     <string name="RECEIVER_NAME">receiver_name</string>
-    <string name="TOOLBAR_TITLE">Recent Connections</string>
+    <string name="TOOLBAR_TITLE">Chat Threads</string>
     <string name="CHAT_SEEN">seen</string>
     <string name="SETTINGS">Settings</string>
     <string name="SETTINGS_TITLE">Search Radius</string>
-    <string name="SETTINGS_SUMMARY">change radius to search people who are far from you</string>
+    <string name="SETTINGS_SUMMARY">change radius to see people near you</string>
     <string name="SHARED_PREF_KEY">search_radius</string>
 </resources>

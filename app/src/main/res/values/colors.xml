@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorPrimary">#C2185B</color>
+    <color name="colorPrimaryDark">#880E4F</color>
     <color name="colorAccent">#D81B60</color>
+
+    <color name="circleColor">#ee6002</color>
+    <color name="threads_pressed_color">#EEEEEE</color>
 
     <color name="nav_background">#fe485a</color>
     <color name="background_grey">#f5f5f5</color>
@@ -11,4 +14,6 @@
     <color name="seek_bar_background">#ababab</color>
     <color name="seek_bar_progress">#ffb600</color>
     <color name="seek_bar_secondary_progress">#3399CC</color>
+    <color name="lastMsgColor">#90A4AE</color>
+    <color name="TIME_COLOR">#B0BEC5</color>
 </resources>
