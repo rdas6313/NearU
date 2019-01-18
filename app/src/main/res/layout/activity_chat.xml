@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Chat.ChatFragment">
+    tools:context=".Chat.ChatActivity">
 
     <!-- TODO: Update blank fragment layout -->
     <android.support.v7.widget.RecyclerView
@@ -18,9 +18,11 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
+        android:background="@drawable/msg_edittext_background"
         android:singleLine="true"
         android:id="@+id/chatinput"
         android:layout_width="0dp"
+        android:padding="12dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
@@ -32,6 +34,8 @@
         app:layout_constraintTop_toTopOf="@+id/chatSendBtn" />
 
     <Button
+        android:background="@drawable/msg_btn_background"
+        android:textColor="@android:color/white"
         android:id="@+id/chatSendBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
