@@ -74,6 +74,13 @@ public class ChatThreads extends Fragment implements ChildEventListener,ThreadsC
         /*Setting Toolbar text and color here */
         toolbar.setTitle(R.string.TOOLBAR_TITLE);
         toolbar.setTitleTextColor(Color.WHITE);
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().onBackPressed();
+            }
+        });
     }
 
     @Override

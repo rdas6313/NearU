@@ -43,6 +43,14 @@ public class SettingsFragment extends Fragment implements SeekBar.OnSeekBarChang
         super.onActivityCreated(savedInstanceState);
         toolbar.setTitle(R.string.SETTINGS);
         toolbar.setTitleTextColor(Color.WHITE);
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().onBackPressed();
+            }
+        });
+
         titleView.setText(getString(R.string.SETTINGS_TITLE));
         summaryView.setText(getString(R.string.SETTINGS_SUMMARY));
         seekBar.incrementProgressBy(5);
