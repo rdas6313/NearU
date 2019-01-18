@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -102,6 +103,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
 
     private MapModel mapModel;
 
+    private ImageView recentChatView,settingsView;
+
+
     public MapFragment() {
         // Required empty public constructor
     }
@@ -115,7 +119,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
 
         View root = inflater.inflate(R.layout.fragment_map, container, false);
         mapView = (MapView) root.findViewById(R.id.mapView);
-
+        recentChatView = (ImageView)root.findViewById(R.id.recent_chat);
+        settingsView = (ImageView)root.findViewById(R.id.settings);
         return root;
     }
 
@@ -127,7 +132,23 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
         mainActivityConnector = (FragmentCallback) getActivity();
         mapModel = MapModel.getInstance(getContext());
         SEARCH_USER_RADIUS = (float) utility.getProgressValueFromSharedPreference(getContext(),getString(R.string.SHARED_PREF_KEY));
-        Log.d(TAG,"SEARCH_RADIUS "+SEARCH_USER_RADIUS);
+        recentChatView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //load recent chat fragment here
+                if(mainActivityConnector != null)
+                    mainActivityConnector.onLoadRecentChatThreads();
+            }
+        });
+
+        settingsView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //load settings fragment here
+                if(mainActivityConnector != null)
+                    mainActivityConnector.onLoadSettings();
+            }
+        });
     }
 
     /* Permission Related Methods Start from here */

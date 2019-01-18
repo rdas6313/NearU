@@ -18,9 +18,8 @@ import com.example.rdas6313.nearu.SignUp.SignUpActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener,FragmentCallback {
+public class MainActivity extends AppCompatActivity implements FragmentCallback {
 
-    private BottomNavigationView bottomNavigationView;
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -33,35 +32,25 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     }
 
     private void init(){
-        bottomNavigationView = (BottomNavigationView)findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setOnNavigationItemSelectedListener(this);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container,new MapFragment())
+                .commit();
+    }
 
-        loadFragments(new MapFragment());
+
+    @Override
+    public void onLoadRecentChatThreads() {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container,new ChatThreads())
+                .addToBackStack(null)
+                .commit();
     }
 
     @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        switch (menuItem.getItemId()){
-            case R.id.location:
-                loadFragments(new MapFragment());
-                return true;
-            case R.id.frnds:
-                loadFragments(new ChatThreads());
-                return true;
-            case R.id.profile:
-                loadFragments(new SettingsFragment());
-                return true;
-            default:
-                return false;
-        }
-    }
-
-
-    private void loadFragments(Fragment fragment){
-        if(fragment == null)
-            return;
+    public void onLoadSettings() {
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container,fragment)
+                .replace(R.id.fragment_container,new SettingsFragment())
+                .addToBackStack(null)
                 .commit();
     }
 
