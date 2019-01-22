@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.example.rdas6313.nearu.Map.FragmentCallback;
 import com.example.rdas6313.nearu.R;
@@ -65,11 +66,7 @@ public class ChatThreads extends Fragment implements ChildEventListener,ThreadsC
         fragmentCallback = (FragmentCallback) getActivity();
 
         Utility utility = Utility.getInstance();
-        threadRef = FirebaseDatabase.getInstance().getReference(getString(R.string.USER_THREADS)+utility.getUserId());
-        threadQuery = threadRef.orderByChild(getString(R.string.CHAT_TIMESTAMP));
-        threadsAdapter = new ThreadsAdapter(this);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(threadsAdapter);
+
 
         /*Setting Toolbar text and color here */
         toolbar.setTitle(R.string.TOOLBAR_TITLE);
@@ -81,6 +78,17 @@ public class ChatThreads extends Fragment implements ChildEventListener,ThreadsC
                 getActivity().onBackPressed();
             }
         });
+        threadsAdapter = new ThreadsAdapter(this);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setAdapter(threadsAdapter);
+        if(!utility.checkInternet(getContext())){
+            Toast.makeText(getContext(),R.string.No_INTERNET_MSG,Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        threadRef = FirebaseDatabase.getInstance().getReference(getString(R.string.USER_THREADS)+utility.getUserId());
+        threadQuery = threadRef.orderByChild(getString(R.string.CHAT_TIMESTAMP));
+
     }
 
     @Override

@@ -2,6 +2,8 @@ package com.example.rdas6313.nearu;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -184,6 +186,16 @@ public final class Utility {
     public int getProgressValueFromSharedPreference(Context context,String key){
         SharedPreferences sharedPreferences = context.getApplicationContext().getSharedPreferences(SHARED_PREFERENCE_NAME,Context.MODE_PRIVATE);
         return sharedPreferences.getInt(key,SHARED_PREFERENCE_DEFAULT_VALUE);
+    }
+
+    public boolean checkInternet(Context context){
+        ConnectivityManager cm =
+                (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+        return isConnected;
     }
 
 }

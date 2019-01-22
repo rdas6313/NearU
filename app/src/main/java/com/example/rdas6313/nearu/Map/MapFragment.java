@@ -237,10 +237,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
             enableGps();
             return;
         }
+        //check internet connection
+        Utility utility = Utility.getInstance();
+        if(!utility.checkInternet(getContext())){
+            Toast.makeText(getContext(),getString(R.string.No_INTERNET_MSG),Toast.LENGTH_LONG).show();
+            return;
+        }
+
         //load Current user Location From Server
         initLocationComponent();
-        loadCurrentUserLocationFromServer();
         initLocationEngine();
+        loadCurrentUserLocationFromServer();
     }
 
     @Override
@@ -415,6 +422,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
         user.setName(dataSnapshot.child(getString(R.string.NAME_KEY)).getValue(String.class));
         Marker marker = utility.addMarkerToMap(user.getLocation(),user.getName(),"",map);
         user.setMarker(marker);
+        utility.adjustCameraZoomForMarkers(map,latLngList,CAMERA_PADDING);
         if(markerData != null)
             markerData.put(marker.getId(),user.getId());
     }
@@ -438,7 +446,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
         fetchUsersDataFromServer(user);
         userData.put(key,user);
         utility.addLatlngToList(latLng,latLngList);
-        utility.adjustCameraZoomForMarkers(map,latLngList,CAMERA_PADDING);
     }
 
     @Override
@@ -628,10 +635,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
 
     @Override
     public void onLoadCurrentUserLocationSuccess(DataSnapshot dataSnapshot) {
+        //Log.d(TAG,"Current Location From DataBase "+dataSnapshot.toString());
         if(gotCurrentLocation || dataSnapshot.getValue() == null)
             return;
 
-        Log.d(TAG,"Loading  "+dataSnapshot.toString());
+     //   Log.d(TAG,"Loading  "+dataSnapshot.toString());
         double lat =  dataSnapshot.child(getString(R.string.LATITUDE)).getValue(Double.class);
         double lng = dataSnapshot.child(getString(R.string.LONGITUDE)).getValue(Double.class);
         currentLocation = new Location(LocationManager.PASSIVE_PROVIDER);

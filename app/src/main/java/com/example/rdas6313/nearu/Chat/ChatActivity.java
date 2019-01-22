@@ -66,6 +66,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             actionBar.setTitle(chatUsername);
         }
         init();
+        Utility utility = Utility.getInstance();
+        if(!utility.checkInternet(this)){
+            Toast.makeText(this,R.string.No_INTERNET_MSG,Toast.LENGTH_SHORT).show();
+            return;
+        }
         loadMessages();
     }
 
