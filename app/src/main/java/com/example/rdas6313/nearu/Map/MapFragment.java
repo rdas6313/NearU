@@ -231,10 +231,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
     }
     /* Permission Related Methods End in here */
 
+    private void gpsOnDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+                .setMessage(R.string.GPS_ON_MSG)
+                .setPositiveButton(R.string.GPS_ON_POS_BTN, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        enableGps();
+                    }
+                });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.setCancelable(false);
+        alertDialog.show();
+    }
 
     private void initLocation() {
         if (!isGpsEnabled()) {
-            enableGps();
+            gpsOnDialog();
             return;
         }
         //check internet connection
