@@ -16,14 +16,10 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <android.support.constraint.ConstraintLayout
-        android:background="@android:color/white"
         android:id="@+id/container_view"
         android:layout_width="382dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
+        android:background="@android:color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -55,9 +51,7 @@
             tools:text="summary" />
 
         <SeekBar
-            android:thumb="@drawable/seek_thumb"
             android:id="@+id/seekBar"
-            android:progressDrawable="@drawable/seek_bar"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
@@ -66,6 +60,8 @@
             android:max="1000"
             android:min="1"
             android:progress="500"
+            android:progressDrawable="@drawable/seek_bar"
+            android:thumb="@drawable/seek_thumb"
             app:layout_constraintEnd_toEndOf="@+id/titleBar"
             app:layout_constraintStart_toStartOf="@+id/summary"
             app:layout_constraintTop_toBottomOf="@+id/summary" />
