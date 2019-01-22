@@ -44,4 +44,6 @@
     <string name="SETTINGS_SUMMARY">change radius to see people near you</string>
     <string name="SHARED_PREF_KEY">search_radius</string>
     <string name="No_INTERNET_MSG">Turn on your internet and restart the app</string>
+    <string name="LOCATION_SEARCH_MSG">Please wait for a moment.Searching your location</string>
+    <string name="neighbour_search_msg">Searching your neighbours</string>
 </resources>

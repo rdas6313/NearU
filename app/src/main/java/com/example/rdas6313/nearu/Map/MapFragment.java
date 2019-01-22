@@ -253,13 +253,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG,"Activity Result "+requestCode+" "+resultCode);
+      //  Log.d(TAG,"Activity Result "+requestCode+" "+resultCode);
         initLocation();
     }
 
     @Override
     public void onMapReady(MapboxMap mapboxMap) {
-        Log.d(TAG, "Map Ready");
+       // Log.d(TAG, "Map Ready");
         map = mapboxMap;
         checkLocationPermission();
         map.setInfoWindowAdapter(this);
@@ -306,7 +306,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
 
     @SuppressWarnings("MissingPermission")
     private void initLocationEngine() {
-        Log.d(TAG, "initEngine");
+      //  Log.d(TAG, "initEngine");
         if (locationEngine == null) {
             locationEngine = new LocationEngineProvider(getContext()).obtainBestLocationEngineAvailable();
             locationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);
@@ -316,7 +316,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
             locationEngine.addLocationEngineListener(this);
             locationEngine.requestLocationUpdates();
         }
-        Log.d(TAG, locationEngine.obtainType().name());
+    //    Log.d(TAG, locationEngine.obtainType().name());
         Location location = locationEngine.getLastLocation();
 
         if (location != null) {
@@ -345,7 +345,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
     private void initLocationComponent() {
         if (map == null)
             return;
-        Log.d(TAG,"InitLocationComponent");
+     //   Log.d(TAG,"InitLocationComponent");
         locationComponent = map.getLocationComponent();
         locationComponent.activateLocationComponent(getContext());
         locationComponent.setLocationComponentEnabled(true);
@@ -359,11 +359,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
         if (locationEngine == null)
             return;
         locationEngine.requestLocationUpdates();
+        Toast.makeText(getContext(),getString(R.string.LOCATION_SEARCH_MSG),Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onLocationChanged(Location location) { // When Device User Location Changed
-        Log.d(TAG, "new Location " + location.getLatitude() + " " + location.getLongitude());
+      //  Log.d(TAG, "new Location " + location.getLatitude() + " " + location.getLongitude());
         currentLocation = location;
         sendLocationDataToServer(location);
         loadUserLocation(location, SEARCH_USER_RADIUS);
@@ -393,6 +394,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
             geoQuery.setLocation(new GeoLocation(location.getLatitude(),location.getLongitude()),radius);
 
         }
+        Toast.makeText(getContext(),getString(R.string.neighbour_search_msg),Toast.LENGTH_SHORT).show();
     }
 
     private void onDisconnect(){
@@ -437,8 +439,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
         if(location.longitude == currentLocation.getLongitude() && location.latitude == currentLocation.getLatitude())
             return;
 
-        Log.d(TAG,"Key Entered "+key);
-        Toast.makeText(getContext(),"Key Entered "+key,Toast.LENGTH_SHORT).show();
+    //    Log.d(TAG,"Key Entered "+key);
+     //   Toast.makeText(getContext(),"Key Entered "+key,Toast.LENGTH_SHORT).show();
         Utility utility = Utility.getInstance();
         initUserDataList();
         LatLng latLng = new LatLng(location.latitude,location.longitude);
@@ -450,8 +452,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
 
     @Override
     public void onKeyExited(String key) {
-        Log.d(TAG,"Key Exited "+key);
-        Toast.makeText(getContext(),"Key Exited "+key,Toast.LENGTH_SHORT).show();
+     //   Log.d(TAG,"Key Exited "+key);
+    //    Toast.makeText(getContext(),"Key Exited "+key,Toast.LENGTH_SHORT).show();
         if(userData != null && userData.containsKey(key)){
             User user = userData.get(key);
             Utility utility = Utility.getInstance();
@@ -467,8 +469,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
 
     @Override
     public void onKeyMoved(String key, GeoLocation location) {
-        Log.d(TAG,"Key Moved "+key);
-        Toast.makeText(getContext(),"Key Moved "+key,Toast.LENGTH_SHORT).show();
+     //   Log.d(TAG,"Key Moved "+key);
+     //   Toast.makeText(getContext(),"Key Moved "+key,Toast.LENGTH_SHORT).show();
         if(userData != null && userData.containsKey(key)){
             User user = userData.get(key);
             LatLng latLng = new LatLng(location.latitude,location.longitude);
@@ -476,7 +478,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
             user.setLocation(latLng);
             user.getMarker().setPosition(latLng);
             utility.adjustCameraZoomForMarkers(map,latLngList,CAMERA_PADDING);
-            Toast.makeText(getContext(),user.getName()+" is Moving. "+key,Toast.LENGTH_SHORT).show();
+           // Toast.makeText(getContext(),user.getName()+" is Moving. "+key,Toast.LENGTH_SHORT).show();
         }else if(location.latitude == currentLocation.getLatitude() && location.longitude == currentLocation.getLongitude()){
             Utility utility = Utility.getInstance();
             utility.updateLatlngFromList(0,new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()),latLngList);
@@ -486,8 +488,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
 
     @Override
     public void onGeoQueryReady() {
-        Log.d(TAG,"Query Ready");
-        Toast.makeText(getContext(),"Query Ready ",Toast.LENGTH_SHORT).show();
+     /*   Log.d(TAG,"Query Ready");
+        Toast.makeText(getContext(),"Query Ready ",Toast.LENGTH_SHORT).show();*/
     }
 
     @Override
@@ -525,7 +527,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
     @Override
     public void onStart() {
         super.onStart();
-        Log.d(TAG, "OnStart");
+    //    Log.d(TAG, "OnStart");
 
         if(mapModel != null)
             mapModel.setListener(this);
@@ -561,7 +563,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
     @Override
     public void onStop() {
         super.onStop();
-        Log.d(TAG,"onStop");
+    //    Log.d(TAG,"onStop");
         shouldCheckPermission = true;
         if(mapModel != null)
             mapModel.setListener(null);
@@ -625,12 +627,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
     private void loadCurrentUserLocationFromServer(){
         Utility utility = Utility.getInstance();
         if(!utility.isUserLoggedIn()) {
-            Log.d(TAG,"user not logged in");
+            Log.e(TAG,"user not logged in");
             return;
         }
-        Log.d(TAG,"Loading Current User Location From Server");
-        if(mapModel != null)
+      //  Log.d(TAG,"Loading Current User Location From Server");
+        if(mapModel != null) {
             mapModel.loadCurrentUserLocation(utility.getUserId());
+            Toast.makeText(getContext(),getString(R.string.LOCATION_SEARCH_MSG),Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
