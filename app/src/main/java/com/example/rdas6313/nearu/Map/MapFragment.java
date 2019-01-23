@@ -165,8 +165,25 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
     @Override
     public void onDontAskAgain() {
         shouldCheckPermission = true;
-        openApplicationSettings();
+        applicationSettingsDialog();
     }
+
+    private void applicationSettingsDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+                .setMessage(getString(R.string.EXPLANATION_DIALOG_MSG))
+                .setPositiveButton(getString(R.string.EXPLANATION_DIALOG_POSITIVE_BTN_TEXT), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        openApplicationSettings();
+                    }
+                });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.setCancelable(false);
+        alertDialog.show();
+    }
+
+
 
     private void openApplicationSettings() {
         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
@@ -202,7 +219,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
                             permissionManager.explanationCompleted(MapFragment.this);
                     }
                 });
-        builder.create().show();
+        AlertDialog alertDialog = builder.create();
+        alertDialog.setCancelable(false);
+        alertDialog.show();
     }
 
     private void showDialog() {
@@ -221,7 +240,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Permiss
                         getActivity().finish();
                     }
                 });
-        builder.create().show();
+        AlertDialog alertDialog = builder.create();
+        alertDialog.setCancelable(false);
+        alertDialog.show();
     }
 
     @Override
