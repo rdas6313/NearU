@@ -48,4 +48,6 @@
     <string name="neighbour_search_msg">Searching your neighbours</string>
     <string name="GPS_ON_MSG">You need to turn on your gps,so that we can locate you.</string>
     <string name="GPS_ON_POS_BTN">Let\'s turn it on</string>
+    <string name="CHAT_THREAD_ERROR_MSG">No data found!</string>
+    <string name="CHAT_MSG_SEEN_KEY">seen</string>
 </resources>

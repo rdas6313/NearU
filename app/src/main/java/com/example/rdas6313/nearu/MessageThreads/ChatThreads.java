@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.rdas6313.nearu.Map.FragmentCallback;
@@ -25,12 +26,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ChatThreads extends Fragment implements ChildEventListener,ThreadsClickListener{
+public class ChatThreads extends Fragment implements ChildEventListener,ThreadsClickListener,ChatModelContract{
 
     private DatabaseReference threadRef;
     private RecyclerView recyclerView;
@@ -40,8 +42,12 @@ public class ChatThreads extends Fragment implements ChildEventListener,ThreadsC
 
     private Toolbar toolbar;
 
+    private TextView errorView;
+
     private FragmentCallback fragmentCallback;
     private final static String TAG = ChatThreads.class.getSimpleName();
+
+    private ChatModel chatModel;
 
     public ChatThreads() {
         // Required empty public constructor
@@ -56,6 +62,7 @@ public class ChatThreads extends Fragment implements ChildEventListener,ThreadsC
         recyclerView = (RecyclerView)root.findViewById(R.id.recycleView);
         toolbar = (Toolbar)root.findViewById(R.id.toolBar);
         progressBar = (ProgressBar)root.findViewById(R.id.recyclerviewProgressbar);
+        errorView = (TextView)root.findViewById(R.id.errorView);
         return root;
     }
 
@@ -69,6 +76,8 @@ public class ChatThreads extends Fragment implements ChildEventListener,ThreadsC
 
 
         /*Setting Toolbar text and color here */
+        errorView.setText(getString(R.string.CHAT_THREAD_ERROR_MSG));
+        errorView.setVisibility(View.GONE);
         toolbar.setTitle(R.string.TOOLBAR_TITLE);
         toolbar.setTitleTextColor(Color.WHITE);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
@@ -88,7 +97,7 @@ public class ChatThreads extends Fragment implements ChildEventListener,ThreadsC
 
         threadRef = FirebaseDatabase.getInstance().getReference(getString(R.string.USER_THREADS)+utility.getUserId());
         threadQuery = threadRef.orderByChild(getString(R.string.CHAT_TIMESTAMP));
-
+        chatModel = ChatModel.getInstance(this);
     }
 
     @Override
@@ -108,7 +117,7 @@ public class ChatThreads extends Fragment implements ChildEventListener,ThreadsC
         String msg = dataSnapshot.child(getString(R.string.CHAT_MSG)).getValue(String.class);
         String key = dataSnapshot.getKey();
         long timestamp = dataSnapshot.child(getString(R.string.CHAT_TIMESTAMP)).getValue(Long.class);
-        boolean is_msg_seen = dataSnapshot.child("seen").getValue(Boolean.class);
+        boolean is_msg_seen = dataSnapshot.child(getString(R.string.CHAT_MSG_SEEN_KEY)).getValue(Boolean.class);
 
         ThreadData threadData = new ThreadData(key,msg,receiverId,senderId,name,timestamp,is_msg_seen);
         return threadData;
@@ -117,11 +126,17 @@ public class ChatThreads extends Fragment implements ChildEventListener,ThreadsC
     @Override
     public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
     //    Log.d(TAG,"Child Added");
-        if(dataSnapshot.getValue() == null) {
-            return;
-        }else if(progressBar.getVisibility() == View.VISIBLE) {
+
+        if(progressBar.getVisibility() == View.VISIBLE) {
             progressBar.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
+        }else if(errorView.getVisibility() == View.VISIBLE){
+            progressBar.setVisibility(View.GONE);
+            errorView.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+        }
+        if(dataSnapshot.getValue() == null) {
+            return;
         }
 
         ThreadData threadData = makeThreadDataObject(dataSnapshot);
@@ -152,10 +167,23 @@ public class ChatThreads extends Fragment implements ChildEventListener,ThreadsC
     }
 
     @Override
+    public void OnChatThreadsHasData(boolean hasData) {
+        if(!hasData){
+            progressBar.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.GONE);
+            errorView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
         recyclerView.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
+        if(chatModel != null) {
+            chatModel.setListener(this);
+            chatModel.doesChatThreadsHasData(getContext());
+        }
         if(threadQuery != null)
            threadQuery.addChildEventListener(this);
     }
@@ -163,6 +191,8 @@ public class ChatThreads extends Fragment implements ChildEventListener,ThreadsC
     @Override
     public void onStop() {
         super.onStop();
+        if(chatModel != null)
+            chatModel.setListener(null);
         if(threadQuery != null)
             threadQuery.removeEventListener(this);
         if(threadsAdapter != null)
